@@ -1,0 +1,13 @@
+package com.epac.hr.repository;
+
+import com.epac.hr.entity.AuditLog;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Repository
+public interface AuditLogRepository extends JpaRepository<AuditLog, Integer> {
+    List<AuditLog> findByTableNameAndRecordId(String tableName, Integer recordId);
+    List<AuditLog> findByChangedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
+}
