@@ -93,6 +93,7 @@
                             </div>
                             <div class="col-md-6">
                                 <p class="info-label">Status:</p>
+                                <p class="info-label" th:text="${company.companyStatus}"></p>
                                 <p>
                                     <span th:if="${company.companyStatus == 'ACTIVE'}" class="badge bg-success">Active</span>
                                     <span th:if="${company.companyStatus == 'INACTIVE'}" class="badge bg-warning">Inactive</span>

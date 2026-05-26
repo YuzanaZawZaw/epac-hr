@@ -31,9 +31,14 @@ public class CompanyController {
         return "company/form";
     }
     
+   
     @PostMapping("/save")
-    public String saveCompany(@ModelAttribute Company company) {
-        companyService.saveCompany(company);
+    public String createCompany(@ModelAttribute Company company) {
+        if(company.getCompanyId() != null) {
+            companyService.updateCompany(company.getCompanyId(), company);
+        } else {
+            companyService.saveCompany(company);
+        }           
         return "redirect:/companies";
     }
     

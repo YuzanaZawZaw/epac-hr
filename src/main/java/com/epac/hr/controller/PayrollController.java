@@ -1,7 +1,6 @@
 package com.epac.hr.controller;
 
 import com.epac.hr.entity.PayrollFortnight;
-import com.epac.hr.entity.PayrollFortnight.PayrollStatus;
 import com.epac.hr.service.PayrollService;
 import com.epac.hr.service.EmployeeService;
 import com.epac.hr.service.FortnightService;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
-import java.util.List;
 
 @Controller
 @RequestMapping("/payroll")

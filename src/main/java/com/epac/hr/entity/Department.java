@@ -23,6 +23,10 @@ public class Department {
     
     @Column(name = "department_code", nullable = false, unique = true, length = 20)
     private String departmentCode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private Company companyId;
     
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
