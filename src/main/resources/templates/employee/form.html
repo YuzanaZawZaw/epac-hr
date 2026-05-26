@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${employee.employeeId} ? 'Edit Employee' : 'Add Employee'" >Employee Form - EPAC HR System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+        }
+        body { background-color: #ecf0f1; margin-top: 60px; }
+        .navbar { background-color: var(--primary-color); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .sidebar { background-color: white; min-height: 100vh; box-shadow: 2px 0 4px rgba(0,0,0,0.1); position: fixed; width: 250px; left: 0; top: 60px; z-index: 100; }
+        .sidebar .nav-link { color: var(--primary-color); border-left: 4px solid transparent; padding: 12px 20px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: #ecf0f1; border-left-color: var(--secondary-color); color: var(--secondary-color); }
+        .main-content { margin-left: 250px; padding: 30px; }
+        .page-header { margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid var(--secondary-color); }
+        .page-header h1 { color: var(--primary-color); }
+        .card { border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-label { font-weight: 500; color: var(--primary-color); }
+        .form-section { margin-top: 25px; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #dee2e6; }
+        .form-section h5 { color: var(--secondary-color); font-weight: bold; margin-bottom: 15px; }
+        .required { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: var(--primary-color);">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/"><i class="fas fa-users-cog"></i> EPAC HR System</a>
+        </div>
+    </nav>
+
+    <div class="sidebar">
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link active" href="/employees"><i class="fas fa-users"></i> Employees</a></li>
+        </ul>
+    </div>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1><i class="fas fa-users"></i> <span th:text="${employee.employeeId} ? 'Edit Employee' : 'Add New Employee'">Add New Employee</span></h1>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header" style="background-color: var(--secondary-color); color: white;">
+                        <h5 class="mb-0">Employee Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/employees/save}" th:object="${employee}" method="POST">
+                            <input type="hidden" th:field="*{employeeId}">
+                            
+                            <!-- Personal Information Section -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-user"></i> Personal Information</h5>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Employee Code <span class="required">*</span></label>
+                                        <input type="text" class="form-control" th:field="*{employeeCode}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Status <span class="required">*</span></label>
+                                        <select class="form-control" th:field="*{employeeStatus}" required>
+                                            <option value="">-- Select Status --</option>
+                                            <option th:each="status : ${statuses}" th:value="${status}" th:text="${status}">Status</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">First Name <span class="required">*</span></label>
+                                        <input type="text" class="form-control" th:field="*{firstName}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Last Name <span class="required">*</span></label>
+                                        <input type="text" class="form-control" th:field="*{lastName}" required>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">Full Name <span class="required">*</span></label>
+                                        <input type="text" class="form-control" th:field="*{fullName}" required>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Gender</label>
+                                        <select class="form-control" th:field="*{gender}">
+                                            <option value="">-- Select Gender --</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Date of Birth</label>
+                                        <input type="date" class="form-control" th:field="*{dateOfBirth}">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">NASFUND Number</label>
+                                        <input type="text" class="form-control" th:field="*{nasfundNumber}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Payroll No.</label>
+                                        <input type="text" class="form-control" th:field="*{payrollNo}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contact Information Section -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-phone"></i> Contact Information</h5>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" th:field="*{email}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone No.</label>
+                                        <input type="text" class="form-control" th:field="*{phoneNo}">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">Home Address</label>
+                                        <textarea class="form-control" th:field="*{homeAddress}" rows="2"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Province Address</label>
+                                        <input type="text" class="form-control" th:field="*{provinceAddress}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Employment Information Section -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-briefcase"></i> Employment Information</h5>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Department</label>
+                                        <select class="form-control" th:field="*{department}">
+                                            <option value="">-- Select Department --</option>
+                                            <option th:each="dept : ${departments}" th:value="${dept.departmentId}" th:text="${dept.departmentName}">Department</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Position</label>
+                                        <select class="form-control" th:field="*{position}">
+                                            <option value="">-- Select Position --</option>
+                                            <option th:each="pos : ${positions}" th:value="${pos.positionId}" th:text="${pos.positionName}">Position</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Company</label>
+                                        <input type="text" class="form-control" th:field="*{company}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Company ID</label>
+                                        <input type="text" class="form-control" th:field="*{companyId}">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Joined Date</label>
+                                        <input type="date" class="form-control" th:field="*{startedJoinedDate}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Hourly Rate</label>
+                                        <input type="number" class="form-control" th:field="*{hourlyRate}" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Additional Information Section -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-notes-medical"></i> Additional Information</h5>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">Remarks</label>
+                                        <textarea class="form-control" th:field="*{remarks}" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-top: 30px;">
+                                <a href="/employees" class="btn btn-secondary btn-lg"><i class="fas fa-times"></i> Cancel</a>
+                                <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i> Save Employee</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

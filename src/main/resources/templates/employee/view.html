@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Details - EPAC HR System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+        }
+        body { background-color: #ecf0f1; margin-top: 60px; }
+        .navbar { background-color: var(--primary-color); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .sidebar { background-color: white; min-height: 100vh; box-shadow: 2px 0 4px rgba(0,0,0,0.1); position: fixed; width: 250px; left: 0; top: 60px; z-index: 100; }
+        .sidebar .nav-link { color: var(--primary-color); border-left: 4px solid transparent; padding: 12px 20px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: #ecf0f1; border-left-color: var(--secondary-color); color: var(--secondary-color); }
+        .main-content { margin-left: 250px; padding: 30px; }
+        .page-header { margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid var(--secondary-color); display: flex; justify-content: space-between; align-items: center; }
+        .page-header h1 { color: var(--primary-color); margin: 0; }
+        .card { border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .info-label { font-weight: 600; color: var(--primary-color); }
+        .info-section { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #dee2e6; }
+        .info-section h5 { color: var(--secondary-color); font-weight: bold; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: var(--primary-color);">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/"><i class="fas fa-users-cog"></i> EPAC HR System</a>
+        </div>
+    </nav>
+
+    <div class="sidebar">
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link active" href="/employees"><i class="fas fa-users"></i> Employees</a></li>
+        </ul>
+    </div>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1><i class="fas fa-user"></i> Employee Details</h1>
+            <div>
+                <a th:href="@{/employees/{id}/edit(id=${employee.employeeId})}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="/employees" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header" style="background-color: var(--secondary-color); color: white;">
+                        <h5 class="mb-0" th:text="${employee.fullName}">Employee Name</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Personal Information Section -->
+                        <div class="info-section">
+                            <h5><i class="fas fa-user"></i> Personal Information</h5>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="info-label">Employee Code:</p>
+                                    <p th:text="${employee.employeeCode}">EMP001</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="info-label">Status:</p>
+                                    <p>
+                                        <span th:if="${employee.employeeStatus == 'ACTIVE'}" class="badge bg-success">Active</span>
+                                        <span th:if="${employee.employeeStatus == 'INACTIVE'}" class="badge bg-warning text-dark">Inactive</span>
+                                        <span th:if="${employee.employeeStatus == 'TERMINATED'}" class="badge bg-danger">Terminated</span>
+                                        <span th:if="${employee.employeeStatus == 'ON_LEAVE'}" class="badge bg-info">On Leave</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="info-label">First Name:</p>
+                                    <p th:text="${employee.firstName}">John</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="info-label">Last Name:</p>
+                                    <p th:text="${employee.lastName}">Doe</p>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="info-label">Gender:</p>
+                                    <p th:text="${employee.gender} ?: 'N/A'">Male</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="info-label">Date of Birth:</p>
+                                    <p th:text="${employee.dateOfBirth} ?: 'N/A'">1990-01-01</p>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="info-label">NASFUND Number:</p>
+                                    <p th:text="${employee.nasfundNumber} ?: 'N/A'">NAS123456</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="info-label">Payroll No.:</p>
+                                    <p th:text="${employee.payrollNo} ?: 'N/A'">PAY001</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information Section -->
+                        <div class="info-section">
+                            <h5><i class="fas fa-phone"></i> Contact Information</h5>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="info-label">Email:</p>
+                                    <p><a th:href="'mailto:' + ${employee.email}" th:text="${employee.email}">john@example.com</a></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="info-label">Phone No.:</p>
+                                    <p th:text="${employee.phoneNo} ?: 'N/A'">+1234567890</p>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <p class="info-label">Home Address:</p>
+                                    <p th:text="${employee.homeAddress} ?: 'N/A'">123 Main Street</p>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="info-label">Province Address:</p>
+                                    <p th:text="${employee.provinceAddress} ?: 'N/A'">Province</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Employment Information Section -->
+                        <div class="info-section">
+                            <h5><i class="fas fa-briefcase"></i> Employment Information</h5>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="info-label">Department:</p>
+                                    <p th:text="${employee.department?.departmentName} ?: 'N/A'">IT</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="info-label">Position:</p>
+                                    <p th:text="${employee.position?.positionName} ?: 'N/A'">Manager</p>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="info-label">Company:</p>
+                                    <p th:text="${employee.company} ?: 'N/A'">ABC Company</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="info-label">Company ID:</p>
+                                    <p th:text="${employee.companyId} ?: 'N/A'">COM001</p>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="info-label">Joined Date:</p>
+                                    <p th:text="${employee.startedJoinedDate} ?: 'N/A'">2020-01-01</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="info-label">Hourly Rate:</p>
+                                    <p th:text="'$' + ${#numbers.formatDecimal(employee.hourlyRate, 1, 2)}">$5.00</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information Section -->
+                        <div class="info-section" th:if="${employee.remarks}">
+                            <h5><i class="fas fa-notes-medical"></i> Remarks</h5>
+                            <p th:text="${employee.remarks}">Additional remarks</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
