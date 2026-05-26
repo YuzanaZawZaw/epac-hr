@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - EPAC HR System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+        }
+        body {
+            background-color: #ecf0f1;
+            margin-top: 60px;
+        }
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .sidebar {
+            background-color: white;
+            min-height: 100vh;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 250px;
+            left: 0;
+            top: 60px;
+        }
+        .sidebar .nav-link {
+            color: var(--primary-color);
+            border-left: 4px solid transparent;
+            padding: 12px 20px;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #ecf0f1;
+            border-left-color: var(--secondary-color);
+            color: var(--secondary-color);
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 30px;
+            border-radius: 8px;
+            color: white;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stat-card h3 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .stat-card p {
+            margin: 10px 0 0 0;
+            font-size: 1rem;
+        }
+        .employees { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .payroll { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .leaves { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .active { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+        .page-header h1 {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: var(--primary-color);">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/"><i class="fas fa-users-cog"></i> EPAC HR System</a>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link active" href="/"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="/employees"><i class="fas fa-users"></i> Employees</a></li>
+            <li class="nav-item"><a class="nav-link" href="/payroll"><i class="fas fa-money-bill"></i> Payroll</a></li>
+            <li class="nav-item"><a class="nav-link" href="/attendance"><i class="fas fa-clock"></i> Attendance</a></li>
+            <li class="nav-item"><a class="nav-link" href="/leaves"><i class="fas fa-calendar-alt"></i> Leaves</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-card employees">
+                    <h3 th:text="${totalEmployees}">0</h3>
+                    <p>Total Employees</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card active">
+                    <h3 th:text="${activeEmployees}">0</h3>
+                    <p>Active Employees</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card payroll">
+                    <h3 th:text="${totalPayrolls}">0</h3>
+                    <p>Total Payrolls</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card leaves">
+                    <h3 th:text="${pendingLeaves}">0</h3>
+                    <p>Pending Leaves</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" style="background-color: var(--secondary-color); color: white;">
+                        <h5 class="mb-0"><i class="fas fa-chart-line"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <a href="/employees/create" class="btn btn-primary w-100">
+                                    <i class="fas fa-plus"></i> Add Employee
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="/payroll/create" class="btn btn-success w-100">
+                                    <i class="fas fa-plus"></i> Create Payroll
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="/attendance/create" class="btn btn-info w-100">
+                                    <i class="fas fa-plus"></i> Add Attendance
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="/leaves/create" class="btn btn-warning w-100">
+                                    <i class="fas fa-plus"></i> New Leave Request
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
