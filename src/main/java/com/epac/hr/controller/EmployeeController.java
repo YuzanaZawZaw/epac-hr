@@ -3,6 +3,7 @@ package com.epac.hr.controller;
 import com.epac.hr.entity.Employee;
 import com.epac.hr.entity.Employee.EmployeeStatus;
 import com.epac.hr.service.EmployeeService;
+import com.epac.hr.service.PositionService;
 import com.epac.hr.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,6 +21,9 @@ public class EmployeeController {
     @Autowired
     private DepartmentService departmentService;
     
+    @Autowired
+    private PositionService positionService;
+    
     @GetMapping
     public String listEmployees(Model model) {
         model.addAttribute("employees", employeeService.getAllEmployees());
@@ -32,6 +36,7 @@ public class EmployeeController {
     public String createEmployeeForm(Model model) {
         model.addAttribute("employee", new Employee());
         model.addAttribute("departments", departmentService.getAllDepartments());
+        model.addAttribute("positions", positionService.getAllPositions());
         model.addAttribute("statuses", EmployeeStatus.values());
         return "employee/form";
     }
@@ -48,6 +53,7 @@ public class EmployeeController {
         if (employee.isPresent()) {
             model.addAttribute("employee", employee.get());
             model.addAttribute("departments", departmentService.getAllDepartments());
+            model.addAttribute("positions", positionService.getAllPositions());
             model.addAttribute("statuses", EmployeeStatus.values());
             return "employee/form";
         }
@@ -65,6 +71,7 @@ public class EmployeeController {
         Optional<Employee> employee = employeeService.getEmployeeById(id);
         if (employee.isPresent()) {
             model.addAttribute("employee", employee.get());
+            model.addAttribute("positions", positionService.getAllPositions());
             return "employee/view";
         }
         return "redirect:/employees";
