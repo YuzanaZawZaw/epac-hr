@@ -3,14 +3,14 @@ package com.epac.hr.controller;
 import com.epac.hr.entity.Employee;
 import com.epac.hr.entity.Employee.EmployeeStatus;
 import com.epac.hr.service.EmployeeService;
-import com.epac.hr.service.PositionService;
-import com.epac.hr.service.CompanyService;
 import com.epac.hr.service.DepartmentService;
+import com.epac.hr.service.PositionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
+import java.util.List;
 
 @Controller
 @RequestMapping("/employees")
@@ -24,9 +24,6 @@ public class EmployeeController {
     
     @Autowired
     private PositionService positionService;
-    
-    @Autowired
-    private CompanyService companyService;
     
     @GetMapping
     public String listEmployees(Model model) {
@@ -42,7 +39,6 @@ public class EmployeeController {
         model.addAttribute("departments", departmentService.getAllDepartments());
         model.addAttribute("positions", positionService.getAllPositions());
         model.addAttribute("statuses", EmployeeStatus.values());
-        model.addAttribute("companies", companyService.getAllCompanies());
         return "employee/form";
     }
     
@@ -76,15 +72,21 @@ public class EmployeeController {
         Optional<Employee> employee = employeeService.getEmployeeById(id);
         if (employee.isPresent()) {
             model.addAttribute("employee", employee.get());
-            model.addAttribute("positions", positionService.getAllPositions());
             return "employee/view";
         }
         return "redirect:/employees";
     }
     
     @GetMapping("/search")
-    public String searchEmployee(@RequestParam String name, Model model) {
-        model.addAttribute("employees", employeeService.searchEmployeeByName(name));
+    public String searchEmployee(@RequestParam(value = "name", required = false) String name, Model model) {
+        if (name != null && !name.trim().isEmpty()) {
+            // Search by full name containing the search term
+            List<Employee> searchResults = employeeService.searchEmployeeByName(name.trim());
+            model.addAttribute("employees", searchResults);
+        } else {
+            // If no search term, return to list page
+            return "redirect:/employees";
+        }
         return "employee/list";
     }
 }
