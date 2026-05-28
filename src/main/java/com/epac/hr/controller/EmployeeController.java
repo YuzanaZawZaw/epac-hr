@@ -80,11 +80,13 @@ public class EmployeeController {
     @GetMapping("/search")
     public String searchEmployee(@RequestParam(value = "name", required = false) String name, Model model) {
         if (name != null && !name.trim().isEmpty()) {
-            // Search by full name containing the search term
+            // Search by full name (first name or last name)
             List<Employee> searchResults = employeeService.searchEmployeeByName(name.trim());
             model.addAttribute("employees", searchResults);
+            model.addAttribute("searchTerm", name.trim());
+            model.addAttribute("isSearching", true);
         } else {
-            // If no search term, return to list page
+            // If no search term, redirect to main list
             return "redirect:/employees";
         }
         return "employee/list";
