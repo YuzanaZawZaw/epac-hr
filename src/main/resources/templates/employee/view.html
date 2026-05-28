@@ -161,10 +161,10 @@
                                     <p class="info-label">Company:</p>
                                     <p th:text="${employee.company} ?: 'N/A'">ABC Company</p>
                                 </div>
-                                <div class="col-md-6">
+                                <!-- <div class="col-md-6">
                                     <p class="info-label">Company ID:</p>
                                     <p th:text="${employee.companyId} ?: 'N/A'">COM001</p>
-                                </div>
+                                </div> -->
                             </div>
 
                             <div class="row mb-3">
@@ -174,7 +174,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <p class="info-label">Hourly Rate:</p>
-                                    <p th:text="'$' + ${#numbers.formatDecimal(employee.hourlyRate, 1, 2)}">$5.00</p>
+                                    <p th:text="'K' + ${#numbers.formatDecimal(employee.hourlyRate, 1, 2)}">K5.00</p>
                                 </div>
                             </div>
                         </div>

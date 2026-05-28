@@ -4,6 +4,7 @@ import com.epac.hr.entity.Employee;
 import com.epac.hr.entity.Employee.EmployeeStatus;
 import com.epac.hr.service.EmployeeService;
 import com.epac.hr.service.PositionService;
+import com.epac.hr.service.CompanyService;
 import com.epac.hr.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,6 +25,9 @@ public class EmployeeController {
     @Autowired
     private PositionService positionService;
     
+    @Autowired
+    private CompanyService companyService;
+    
     @GetMapping
     public String listEmployees(Model model) {
         model.addAttribute("employees", employeeService.getAllEmployees());
@@ -38,6 +42,7 @@ public class EmployeeController {
         model.addAttribute("departments", departmentService.getAllDepartments());
         model.addAttribute("positions", positionService.getAllPositions());
         model.addAttribute("statuses", EmployeeStatus.values());
+        model.addAttribute("companies", companyService.getAllCompanies());
         return "employee/form";
     }
     

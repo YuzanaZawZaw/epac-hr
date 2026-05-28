@@ -119,6 +119,6 @@ public class Employee {
     }
     
     public enum EmployeeStatus {
-        ACTIVE, INACTIVE, TERMINATED, ON_LEAVE
+        ACTIVE, SUSPENDED, TERMINATED, ON_LEAVE
     }
 }

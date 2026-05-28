@@ -173,12 +173,15 @@
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label">Company</label>
-                                        <input type="text" class="form-control" th:field="*{company}">
+                                        <select class="form-control" th:field="*{company}">
+                                            <option value="">-- Select Company --</option>
+                                            <option th:each="company : ${companies}" th:value="${company.companyId}" th:text="${company.companyName}">Company</option>
+                                        </select>
                                     </div>
-                                    <div class="col-md-6">
+                                    <!-- <div class="col-md-6">
                                         <label class="form-label">Company ID</label>
                                         <input type="text" class="form-control" th:field="*{companyId}">
-                                    </div>
+                                    </div> -->
                                 </div>
 
                                 <div class="row mb-3">
