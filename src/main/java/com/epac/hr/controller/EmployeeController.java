@@ -3,6 +3,7 @@ package com.epac.hr.controller;
 import com.epac.hr.entity.Employee;
 import com.epac.hr.entity.Employee.EmployeeStatus;
 import com.epac.hr.service.EmployeeService;
+import com.epac.hr.service.CompanyService;
 import com.epac.hr.service.DepartmentService;
 import com.epac.hr.service.PositionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class EmployeeController {
     @Autowired
     private PositionService positionService;
     
+    @Autowired
+    private CompanyService companyService;
+
     @GetMapping
     public String listEmployees(Model model) {
         model.addAttribute("employees", employeeService.getAllEmployees());
@@ -38,6 +42,7 @@ public class EmployeeController {
         model.addAttribute("employee", new Employee());
         model.addAttribute("departments", departmentService.getAllDepartments());
         model.addAttribute("positions", positionService.getAllPositions());
+        model.addAttribute("companies", companyService.getAllCompanies());
         model.addAttribute("statuses", EmployeeStatus.values());
         return "employee/form";
     }
@@ -55,6 +60,7 @@ public class EmployeeController {
             model.addAttribute("employee", employee.get());
             model.addAttribute("departments", departmentService.getAllDepartments());
             model.addAttribute("positions", positionService.getAllPositions());
+            model.addAttribute("companies", companyService.getAllCompanies());
             model.addAttribute("statuses", EmployeeStatus.values());
             return "employee/form";
         }
@@ -80,11 +86,13 @@ public class EmployeeController {
     @GetMapping("/search")
     public String searchEmployee(@RequestParam(value = "name", required = false) String name, Model model) {
         if (name != null && !name.trim().isEmpty()) {
-            // Search by full name containing the search term
+            // Search by full name (first name or last name)
             List<Employee> searchResults = employeeService.searchEmployeeByName(name.trim());
             model.addAttribute("employees", searchResults);
+            model.addAttribute("searchTerm", name.trim());
+            model.addAttribute("isSearching", true);
         } else {
-            // If no search term, return to list page
+            // If no search term, redirect to main list
             return "redirect:/employees";
         }
         return "employee/list";
