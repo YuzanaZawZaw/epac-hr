@@ -32,12 +32,7 @@
         </div>
     </nav>
 
-    <div class="sidebar">
-        <ul class="nav flex-column">
-            <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i> Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link active" href="/employees"><i class="fas fa-users"></i> Employees</a></li>
-        </ul>
-    </div>
+    <div th:replace="~{fragments/sidebar :: sidebar('employees')}"></div>
 
     <main class="main-content">
         <div class="page-header">
