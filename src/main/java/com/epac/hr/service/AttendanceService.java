@@ -19,6 +19,9 @@ public class AttendanceService {
 
     @Transactional
     public List<Attendance> saveAll(List<Attendance> rows) {
+        if (rows == null) {
+            return List.of();
+        }
         return repository.saveAll(rows);
     }
 
