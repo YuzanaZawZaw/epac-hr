@@ -1,69 +1,49 @@
 package com.epac.hr.service;
 
+import com.epac.hr.entity.Department;
 import com.epac.hr.entity.Position;
+import com.epac.hr.repository.DepartmentRepository;
 import com.epac.hr.repository.PositionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class PositionService {
-    
-    @Autowired
-    private PositionRepository positionRepository;
-    
-    public Position savePosition(Position position) {
-        Objects.requireNonNull(position, "position must not be null");
-        Position saved = positionRepository.save(position);
-        return Objects.requireNonNull(saved, "saved position must not be null");
+
+    private final PositionRepository positionRepository;
+    private final DepartmentRepository departmentRepository;
+
+    public PositionService(PositionRepository positionRepository, DepartmentRepository departmentRepository) {
+        this.positionRepository = positionRepository;
+        this.departmentRepository = departmentRepository;
     }
-    
-    public Optional<Position> getPositionById(Integer id) {
-        Objects.requireNonNull(id, "id must not be null");
-        Objects.requireNonNull(positionRepository, "positionRepository must not be null");
-        return positionRepository.findById(id);
-    }
-    
-    public List<Position> getAllPositions() {
-        Objects.requireNonNull(positionRepository, "positionRepository must not be null");
-        return positionRepository.findAll();
-    }
-    
-    public Optional<Position> getPositionByCode(String code) {
-        Objects.requireNonNull(code, "code must not be null");
-        return positionRepository.findByPositionCode(code);
-    }
-    
-    public Optional<Position> getPositionByName(String name) {
-        Objects.requireNonNull(name, "name must not be null");
-        return positionRepository.findByPositionName(name);
-    }
-    
-    public List<Position> getPositionsByDepartment(Integer departmentId) {
-        Objects.requireNonNull(departmentId, "departmentId must not be null");
+
+    public List<Position> findByDepartment(Integer departmentId) {
         return positionRepository.findByDepartmentDepartmentId(departmentId);
     }
-    
-    public Position updatePosition(Integer id, Position position) {
-        Objects.requireNonNull(id, "id must not be null");
-        Objects.requireNonNull(position, "position must not be null");
-        Objects.requireNonNull(positionRepository, "positionRepository must not be null");
-        Optional<Position> existing = positionRepository.findById(id);
-        if (existing.isPresent()) {
-            Position pos = existing.get();
-            pos.setPositionName(position.getPositionName());
-            pos.setPositionCode(position.getPositionCode());
-            pos.setDepartment(position.getDepartment());
-            return positionRepository.save(pos);
-        }
-        return null;
+
+    @Transactional
+    public Position createForDepartment(Integer departmentId, Position position) {
+        Department dept = departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Department not found: " + departmentId));
+        position.setDepartment(dept);
+        return positionRepository.save(position);
     }
-    
-    public void deletePosition(Integer id) {
-        Objects.requireNonNull(id, "id must not be null");
-        Objects.requireNonNull(positionRepository, "positionRepository must not be null");
+
+    @Transactional
+    public Position update(Integer id, Position dto) {
+        Position existing = positionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Position not found: " + id));
+        existing.setPositionName(dto.getPositionName());
+        existing.setPositionCode(dto.getPositionCode());
+        if (dto.getDepartment() != null) existing.setDepartment(dto.getDepartment());
+        return positionRepository.save(existing);
+    }
+
+    @Transactional
+    public void delete(Integer id) {
         positionRepository.deleteById(id);
     }
 }

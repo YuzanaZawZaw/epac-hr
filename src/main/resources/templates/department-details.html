@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Department Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body class="p-4">
+  <div class="container">
+    <a th:href="@{'/companies/' + ${department.companyId.companyId}}">&larr; Back to Company</a>
+    <h2 th:text="${department.departmentName}">Department Name</h2>
+    <div class="mb-3">
+      <strong>Code:</strong> <span th:text="${department.departmentCode}">D001</span>
+    </div>
+
+    <h4>Positions</h4>
+    <table class="table table-sm table-bordered">
+      <thead>
+        <tr><th>#</th><th>Name</th><th>Code</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="pos,iterStat : ${positions}">
+          <td th:text="${iterStat.count}">1</td>
+          <td th:text="${pos.positionName}">Position Name</td>
+          <td th:text="${pos.positionCode}">P001</td>
+          <td>
+            <a th:href="@{'/departments/' + ${department.departmentId} + '/positions/' + ${pos.positionId} + '/edit'}" class="btn btn-sm btn-outline-primary">Edit</a>
+            <form th:action="@{'/departments/' + ${department.departmentId} + '/positions/' + ${pos.positionId} + '/delete'}" method="post" style="display:inline" onsubmit="return confirm('Delete position?');">
+              <button class="btn btn-sm btn-outline-danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+        <tr th:if="${positions.size()} == 0"><td colspan="4">No positions yet.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">Create Position for <span th:text="${department.departmentName}">Department</span></h5>
+        <form th:action="@{'/departments/' + ${department.departmentId} + '/positions'}" th:object="${newPosition}" method="post">
+          <div class="mb-3">
+            <label class="form-label">Position Name</label>
+            <input class="form-control" type="text" th:field="*{positionName}" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Position Code</label>
+            <input class="form-control" type="text" th:field="*{positionCode}" required />
+          </div>
+          <button class="btn btn-primary">Create</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit form appears when editPosition present -->
+    <div th:if="${editPosition != null}" class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">Edit Position</h5>
+        <form th:action="@{'/departments/' + ${department.departmentId} + '/positions/' + ${editPosition.positionId} + '/update'}" th:object="${editPosition}" method="post">
+          <div class="mb-3">
+            <label class="form-label">Position Name</label>
+            <input class="form-control" type="text" th:field="*{positionName}" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Position Code</label>
+            <input class="form-control" type="text" th:field="*{positionCode}" required />
+          </div>
+          <button class="btn btn-primary">Update</button>
+          <a th:href="@{'/departments/' + ${department.departmentId}}" class="btn btn-secondary">Cancel</a>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
