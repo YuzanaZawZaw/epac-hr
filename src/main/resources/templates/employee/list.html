@@ -117,9 +117,9 @@
                                 <th><i class="fas fa-user"></i> Full Name</th>
                                 <th><i class="fas fa-envelope"></i> Email</th>
                                 <th><i class="fas fa-phone"></i> Phone</th>
-                                <th><i class="fas fa-briefcase"></i> Position</th>
+                                <!-- <th><i class="fas fa-briefcase"></i> Position</th>
                                 <th><i class="fas fa-building"></i> Department</th>
-                                <th><i class="fas fa-toggle-on"></i> Status</th>
+                                <th><i class="fas fa-toggle-on"></i> Status</th> -->
                                 <th><i class="fas fa-cog"></i> Actions</th>
                             </tr>
                         </thead>
@@ -133,15 +133,15 @@
                                     <a th:href="'mailto:' + ${employee.email}" th:text="${employee.email}" style="text-decoration: none;">john@example.com</a>
                                 </td>
                                 <td th:text="${employee.phoneNo} ?: '-'">+1234567890</td>
-                                <td>
+                                <!-- <td>
                                     <span th:if="${employee.position != null}" th:text="${employee.position.positionName}">Manager</span>
                                     <span th:if="${employee.position == null}">-</span>
                                 </td>
                                 <td>
                                     <span th:if="${employee.department != null}" th:text="${employee.department.departmentName}">IT</span>
                                     <span th:if="${employee.department == null}">-</span>
-                                </td>
-                                <td>
+                                </td> -->
+                                <!-- <td>
                                     <span th:if="${employee.employeeStatus.name() == 'ACTIVE'}"
                                         class="badge bg-success">Active</span>
                                     <span th:if="${employee.employeeStatus.name() == 'SUSPENDED'}"
@@ -150,7 +150,7 @@
                                         class="badge bg-danger">Terminated</span>
                                     <span th:if="${employee.employeeStatus.name() == 'ON_LEAVE'}"
                                         class="badge bg-info">On Leave</span>
-                                </td>
+                                </td> -->
                                 <td>
                                     <div class="btn-group" role="group">
                                         <a th:href="@{/employees/{id}(id=${employee.employeeId})}" class="btn btn-sm btn-info" title="View Details">

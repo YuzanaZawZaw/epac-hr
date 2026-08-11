@@ -69,6 +69,7 @@
                     <table class="table table-hover">
                         <thead style="background-color: #f8f9fa;">
                             <tr>
+                                <th>ID</th>
                                 <th>Code</th>
                                 <th>Company Name</th>
                                 <th>Email</th>
@@ -81,6 +82,7 @@
                         </thead>
                         <tbody>
                             <tr th:each="company : ${companies}">
+                                <td th:text="${company.companyId}">001</td>
                                 <td th:text="${company.companyCode}">COM001</td>
                                 <td th:text="${company.companyName}">Company Name</td>
                                 <td th:text="${company.email}">company@example.com</td>

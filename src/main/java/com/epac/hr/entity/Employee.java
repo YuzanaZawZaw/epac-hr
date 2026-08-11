@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "employees", indexes = {
     @Index(name = "idx_employee_code", columnList = "employee_code"),
-    @Index(name = "idx_employee_status", columnList = "employee_status"),
-    @Index(name = "idx_department", columnList = "department_id")
+    // @Index(name = "idx_employee_status", columnList = "employee_status")
+    // @Index(name = "idx_department", columnList = "department_id")
 })
 @Data
 @NoArgsConstructor
@@ -45,24 +45,7 @@ public class Employee {
     
     @Column(name = "age")
     private Integer age;
-    
-    @Column(name = "nasfund_number", length = 20)
-    private String nasfundNumber;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "position_id")
-    private Position position;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id")
-    private Department department;
-    
-    @Column(name = "company", length = 100)
-    private String company;
-    
-    @Column(name = "company_id", length = 20)
-    private String companyId;
-    
+
     @Column(name = "home_address", length = 255)
     private String homeAddress;
     
@@ -74,21 +57,11 @@ public class Employee {
     
     @Column(name = "email", length = 100)
     private String email;
-    
-    @Column(name = "started_joined_date")
-    private LocalDate startedJoinedDate;
-    
-    @Column(name = "length_of_service", length = 50)
-    private String lengthOfService;
-    
+
     @Column(name = "payroll_no", length = 20)
     private String payrollNo;
-    
-    @Column(name = "employee_status")
-    @Enumerated(EnumType.STRING)
-    private EmployeeStatus employeeStatus = EmployeeStatus.ACTIVE;
-    
-    @Column(name = "hourly_rate", precision = 10, scale = 2)
+
+      @Column(name = "hourly_rate", precision = 10, scale = 2)
     private BigDecimal hourlyRate = new BigDecimal("5.00");
     
     @Column(name = "remarks", columnDefinition = "TEXT")
@@ -102,7 +75,36 @@ public class Employee {
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    // @Column(name = "nasfund_number", length = 20)
+    // private String nasfundNumber;
     
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "position_id")
+    // private Position position;
+    
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "department_id")
+    // private Department department;
+    
+    // @Column(name = "company", length = 100)
+    // private String company;
+    
+    // @Column(name = "company_id", length = 20)
+    // private String companyId;
+    
+    // @Column(name = "started_joined_date")
+    // private LocalDate startedJoinedDate;
+    
+    // @Column(name = "length_of_service", length = 50)
+    // private String lengthOfService;
+    
+
+    // @Column(name = "employee_status")
+    // @Enumerated(EnumType.STRING)
+    // private EmployeeStatus employeeStatus = EmployeeStatus.ACTIVE;
+    
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -118,7 +120,7 @@ public class Employee {
         Male, Female, Other
     }
     
-    public enum EmployeeStatus {
-        ACTIVE, SUSPENDED, TERMINATED, ON_LEAVE
-    }
+    // public enum EmployeeStatus {
+    //     ACTIVE, SUSPENDED, TERMINATED, ON_LEAVE
+    // }
 }

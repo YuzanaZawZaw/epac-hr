@@ -1,11 +1,11 @@
 package com.epac.hr.controller;
 
 import com.epac.hr.entity.Employee;
-import com.epac.hr.entity.Employee.EmployeeStatus;
+//import com.epac.hr.entity.Employee.EmployeeStatus;
 import com.epac.hr.service.EmployeeService;
-import com.epac.hr.service.CompanyService;
-import com.epac.hr.service.DepartmentService;
-import com.epac.hr.service.PositionService;
+// import com.epac.hr.service.CompanyService;
+// import com.epac.hr.service.DepartmentService;
+// import com.epac.hr.service.PositionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,30 +20,31 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
     
-    @Autowired
-    private DepartmentService departmentService;
+    // @Autowired
+    // private DepartmentService departmentService;
     
-    @Autowired
-    private PositionService positionService;
+    // @Autowired
+    // private PositionService positionService;
     
-    @Autowired
-    private CompanyService companyService;
+    // @Autowired
+    // private CompanyService companyService;
 
     @GetMapping
     public String listEmployees(Model model) {
         model.addAttribute("employees", employeeService.getAllEmployees());
         model.addAttribute("totalEmployees", employeeService.getTotalEmployees());
-        model.addAttribute("activeEmployees", employeeService.getActiveEmployeesCount());
+        //model.addAttribute("activeEmployees", employeeService.getActiveEmployeesCount());
         return "employee/list";
     }
     
     @GetMapping("/create")
     public String createEmployeeForm(Model model) {
-        model.addAttribute("employee", new Employee());
-        model.addAttribute("departments", departmentService.getAllDepartments());
-        model.addAttribute("positions", positionService.getAllPositions());
-        model.addAttribute("companies", companyService.getAllCompanies());
-        model.addAttribute("statuses", EmployeeStatus.values());
+         Employee employee = new Employee();
+        model.addAttribute("employee", employee);
+        //model.addAttribute("departments", departmentService.getAllDepartments());
+        //model.addAttribute("positions", positionService.getAllPositions());
+        //model.addAttribute("companies", companyService.getAllCompanies());
+        //model.addAttribute("statuses", EmployeeStatus.values());
         return "employee/form";
     }
     
@@ -58,10 +59,10 @@ public class EmployeeController {
         Optional<Employee> employee = employeeService.getEmployeeById(id);
         if (employee.isPresent()) {
             model.addAttribute("employee", employee.get());
-            model.addAttribute("departments", departmentService.getAllDepartments());
-            model.addAttribute("positions", positionService.getAllPositions());
-            model.addAttribute("companies", companyService.getAllCompanies());
-            model.addAttribute("statuses", EmployeeStatus.values());
+            //model.addAttribute("departments", departmentService.getAllDepartments());
+            //model.addAttribute("positions", positionService.getAllPositions());
+            //model.addAttribute("companies", companyService.getAllCompanies());
+            //model.addAttribute("statuses", EmployeeStatus.values());
             return "employee/form";
         }
         return "redirect:/employees";

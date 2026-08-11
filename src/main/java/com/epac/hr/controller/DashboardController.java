@@ -25,7 +25,7 @@ public class DashboardController {
     @GetMapping
     public String dashboard(Model model) {
         model.addAttribute("totalEmployees", employeeService.getTotalEmployees());
-        model.addAttribute("activeEmployees", employeeService.getActiveEmployeesCount());
+        //model.addAttribute("activeEmployees", employeeService.getActiveEmployeesCount());
         model.addAttribute("totalPayrolls", payrollService.getAllPayrolls().size());
         model.addAttribute("pendingLeaves", leaveService.getLeaveRequestsByStatus(com.epac.hr.entity.LeaveRequest.ApprovalStatus.PENDING).size());
         return "dashboard";

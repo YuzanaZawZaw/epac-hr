@@ -1,14 +1,19 @@
 package com.epac.hr.controller;
 
 import com.epac.hr.entity.Company;
+import com.epac.hr.entity.Company.CompanyStatus;
 import com.epac.hr.entity.Department;
 import com.epac.hr.repository.CompanyRepository;
+import com.epac.hr.service.CompanyService;
 import com.epac.hr.service.DepartmentService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/companies")
@@ -16,10 +21,76 @@ public class CompanyController {
 
     private final CompanyRepository companyRepository;
     private final DepartmentService departmentService;
+    @Autowired
+    private CompanyService companyService;
 
     public CompanyController(CompanyRepository companyRepository, DepartmentService departmentService) {
         this.companyRepository = companyRepository;
         this.departmentService = departmentService;
+    }
+
+    @GetMapping
+    public String listCompanies(Model model) {
+        model.addAttribute("companies", companyService.getAllCompanies());
+        model.addAttribute("totalCompanies", companyService.getTotalCompanies());
+        model.addAttribute("activeCompanies", companyService.getActiveCompaniesCount());
+        return "company/list";
+    }
+    
+    @GetMapping("/create")
+    public String createCompanyForm(Model model) {
+        model.addAttribute("company", new Company());
+        model.addAttribute("statuses", CompanyStatus.values());
+        return "company/form";
+    }
+    
+   
+    @PostMapping("/save")
+    public String createCompany(@ModelAttribute Company company) {
+        if(company.getCompanyId() != null) {
+            companyService.updateCompany(company.getCompanyId(), company);
+        } else {
+            companyService.saveCompany(company);
+        }           
+        return "redirect:/companies";
+    }
+    
+    @GetMapping("/{id}/edit")
+    public String editCompanyForm(@PathVariable Integer id, Model model) {
+        Optional<Company> company = companyService.getCompanyById(id);
+        if (company.isPresent()) {
+            model.addAttribute("company", company.get());
+            model.addAttribute("statuses", CompanyStatus.values());
+            return "company/form";
+        }
+        return "redirect:/companies";
+    }
+    
+    // @GetMapping("/{id}")
+    // public String viewCompany(@PathVariable Integer id, Model model) {
+    //     Optional<Company> company = companyService.getCompanyById(id);
+    //     if (company.isPresent()) {
+    //         model.addAttribute("company", company.get());
+    //         return "company/view";
+    //     }
+    //     return "redirect:/companies";
+    // }
+    
+    @GetMapping("/{id}/delete")
+    public String deleteCompany(@PathVariable Integer id) {
+        companyService.deleteCompany(id);
+        return "redirect:/companies";
+    }
+    
+    @GetMapping("/search")
+    public String searchCompany(@RequestParam String name, Model model) {
+        Optional<Company> company = companyService.getCompanyByName(name);
+        if (company.isPresent()) {
+            model.addAttribute("companies", java.util.List.of(company.get()));
+        } else {
+            model.addAttribute("companies", java.util.List.of());
+        }
+        return "company/list";
     }
 
     // Show company details and departments
@@ -30,6 +101,8 @@ public class CompanyController {
         model.addAttribute("company", company);
         model.addAttribute("departments", departments);
         model.addAttribute("newDepartment", new Department());
+        model.addAttribute("showCompanyDetails", true);
+        model.addAttribute("activePage", "companies-details");
         return "company-details";
     }
 
@@ -55,6 +128,8 @@ public class CompanyController {
         model.addAttribute("company", company);
         model.addAttribute("departments", departmentService.findByCompany(companyId));
         model.addAttribute("editDepartment", dept);
+        // For the Add Department form
+        model.addAttribute("newDepartment", new Department());
         return "company-details"; // reuse the same page which will show edit form if editDepartment present
     }
 

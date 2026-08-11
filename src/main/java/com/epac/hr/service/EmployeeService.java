@@ -1,7 +1,7 @@
 package com.epac.hr.service;
 
 import com.epac.hr.entity.Employee;
-import com.epac.hr.entity.Employee.EmployeeStatus;
+//import com.epac.hr.entity.Employee.EmployeeStatus;
 import com.epac.hr.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,26 +40,26 @@ public class EmployeeService {
         return employeeRepository.findByEmail(email);
     }
     
-    public List<Employee> getEmployeesByStatus(EmployeeStatus status) {
-        Objects.requireNonNull(status, "status must not be null");
-        return employeeRepository.findByEmployeeStatus(status);
-    }
+    // public List<Employee> getEmployeesByStatus(EmployeeStatus status) {
+    //     Objects.requireNonNull(status, "status must not be null");
+    //     return employeeRepository.findByEmployeeStatus(status);
+    // }
     
-    public List<Employee> getEmployeesByDepartment(Integer departmentId) {
-        Objects.requireNonNull(departmentId, "departmentId must not be null");
-        return employeeRepository.findByDepartmentDepartmentId(departmentId);
-    }
+    // public List<Employee> getEmployeesByDepartment(Integer departmentId) {
+    //     Objects.requireNonNull(departmentId, "departmentId must not be null");
+    //     return employeeRepository.findByDepartmentDepartmentId(departmentId);
+    // }
     
     public List<Employee> searchEmployeeByName(String name) {
         Objects.requireNonNull(name, "name must not be null");
         return employeeRepository.searchByFullName(name);
     }
     
-    public List<Employee> getEmployeesByStatusAndDepartment(EmployeeStatus status, Integer departmentId) {
-        Objects.requireNonNull(status, "status must not be null");
-        Objects.requireNonNull(departmentId, "departmentId must not be null");
-        return employeeRepository.findByStatusAndDepartment(status, departmentId);
-    }
+    // public List<Employee> getEmployeesByStatusAndDepartment(EmployeeStatus status, Integer departmentId) {
+    //     Objects.requireNonNull(status, "status must not be null");
+    //     Objects.requireNonNull(departmentId, "departmentId must not be null");
+    //     return employeeRepository.findByStatusAndDepartment(status, departmentId);
+    // }
     
     public Employee updateEmployee(Integer id, Employee employee) {
         Objects.requireNonNull(id, "id must not be null");
@@ -73,7 +73,7 @@ public class EmployeeService {
             emp.setEmail(employee.getEmail());
             emp.setPhoneNo(employee.getPhoneNo());
             emp.setHomeAddress(employee.getHomeAddress());
-            emp.setEmployeeStatus(employee.getEmployeeStatus());
+            //emp.setEmployeeStatus(employee.getEmployeeStatus());
             emp.setHourlyRate(employee.getHourlyRate());
             return employeeRepository.save(emp);
         }
@@ -90,8 +90,8 @@ public class EmployeeService {
         return employeeRepository.count();
     }
     
-    public long getActiveEmployeesCount() {
-        Objects.requireNonNull(employeeRepository, "employeeRepository must not be null");
-        return employeeRepository.findByEmployeeStatus(EmployeeStatus.ACTIVE).size();
-    }
+    // public long getActiveEmployeesCount() {
+    //     Objects.requireNonNull(employeeRepository, "employeeRepository must not be null");
+    //     return employeeRepository.findByEmployeeStatus(EmployeeStatus.ACTIVE).size();
+    // }
 }
