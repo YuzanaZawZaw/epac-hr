@@ -4,6 +4,8 @@ import com.epac.hr.entity.Company;
 import com.epac.hr.entity.Department;
 import com.epac.hr.repository.CompanyRepository;
 import com.epac.hr.repository.DepartmentRepository;
+
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,14 +28,14 @@ public class DepartmentService {
     }
 
     @Transactional
-    public Department createForCompany(Integer companyId, Department department) {
+    public Department createForCompany(@NonNull Integer companyId, Department department) {
         Company company = companyRepository.findById(companyId).orElseThrow(() -> new IllegalArgumentException("Company not found: " + companyId));
         department.setCompanyId(company);
         return departmentRepository.save(department);
     }
 
     @Transactional
-    public Department update(Integer id, Department dto) {
+    public Department update(@NonNull Integer id, Department dto) {
         Department existing = departmentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Department not found: " + id));
         existing.setDepartmentName(dto.getDepartmentName());
         existing.setDepartmentCode(dto.getDepartmentCode());
@@ -43,7 +45,7 @@ public class DepartmentService {
     }
 
     @Transactional
-    public void delete(Integer id) {
+    public void delete(@NonNull Integer id) {
         departmentRepository.deleteById(id);
     }
 }

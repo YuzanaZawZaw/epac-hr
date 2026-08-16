@@ -4,6 +4,8 @@ import com.epac.hr.entity.Department;
 import com.epac.hr.entity.Position;
 import com.epac.hr.repository.DepartmentRepository;
 import com.epac.hr.repository.PositionRepository;
+
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +27,7 @@ public class PositionService {
     }
 
     @Transactional
-    public Position createForDepartment(Integer departmentId, Position position) {
+    public Position createForDepartment(@NonNull Integer departmentId, Position position) {
         Department dept = departmentRepository.findById(departmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Department not found: " + departmentId));
         position.setDepartment(dept);
@@ -33,7 +35,7 @@ public class PositionService {
     }
 
     @Transactional
-    public Position update(Integer id, Position dto) {
+    public Position update(@NonNull Integer id, Position dto) {
         Position existing = positionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Position not found: " + id));
         existing.setPositionName(dto.getPositionName());
@@ -43,7 +45,7 @@ public class PositionService {
     }
 
     @Transactional
-    public void delete(Integer id) {
+    public void delete(@NonNull Integer id) {
         positionRepository.deleteById(id);
     }
 }

@@ -125,6 +125,12 @@
           <td th:text="${dept.departmentName}">Dept Name</td>
           <td th:text="${dept.departmentCode}">D001</td>
           <td>
+            <a th:href="@{/departments/{companyId}/departments/{departmentId}/view(
+                companyId=${company.companyId},
+                departmentId=${dept.departmentId}
+            )}" class="btn btn-sm btn-outline-primary">
+              View
+            </a>
             <a th:href="@{'/companies/' + ${company.companyId} + '/departments/' + ${dept.departmentId} + '/edit'}"
               class="btn btn-sm btn-outline-primary">Edit</a>
             <!-- <form th:action="@{'/companies/' + ${company.companyId} + '/departments/' + ${dept.departmentId} + '/delete'}" method="post" style="display:inline" onsubmit="return confirm('Delete department?');">

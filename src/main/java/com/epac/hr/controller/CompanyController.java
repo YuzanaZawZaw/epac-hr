@@ -96,8 +96,10 @@ public class CompanyController {
     // Show company details and departments
     @GetMapping("/{companyId}")
     public String details(@PathVariable Integer companyId, Model model) {
-        Company company = companyRepository.findById(companyId).orElseThrow(() -> new IllegalArgumentException("Company not found: " + companyId));
-        List<Department> departments = departmentService.findByCompany(companyId);
+        Integer nonNullCompanyId = java.util.Objects.requireNonNull(companyId, "Company ID must not be null");
+        Company company = companyRepository.findById(nonNullCompanyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found: " + nonNullCompanyId));
+        List<Department> departments = departmentService.findByCompany(nonNullCompanyId);
         model.addAttribute("company", company);
         model.addAttribute("departments", departments);
         model.addAttribute("newDepartment", new Department());

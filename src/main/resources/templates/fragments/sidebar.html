@@ -1,25 +1,41 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <body>
-<div th:fragment="sidebar(activePage)" class="sidebar">
+    <div th:fragment="sidebar(activePage)" class="sidebar">
         <ul class="nav flex-column">
-            <li class="nav-item"><a class="nav-link" th:classappend="${activePage == 'dashboard'} ? ' active bg-primary text-white'" href="/"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link"
+                    th:classappend="${activePage == 'dashboard'} ? ' active bg-primary text-white'" href="/"><i
+                        class="fas fa-home"></i> Dashboard</a></li>
             <li class="nav-item"><a class="nav-link" th:classappend="${activePage == 'companies'} ? ' active bg-primary text-white'" href="/companies"><i class="fas fa-building"></i> Companies</a></li>
-            <!-- <li class="nav-item"><a class="nav-link" th:classappend="${activePage == 'companies-details'} ? ' active bg-primary text-white'" href="/companies-detail"><i class="fas fa-building"></i> Company Details</a></li> -->
-             <!-- Company Details - Hidden by default -->
-            <li class="nav-item"
-                th:if="${showCompanyDetails}">
-                <a class="nav-link"
-                th:classappend="${activePage == 'companies-details'} ? ' active bg-primary text-white'"
-                th:href="@{/companies/{id}(id=${company.companyId})}">
-                    <i class="fas fa-building"></i> Company Details
+             <li class="nav-item ms-3" th:if="${showCompanyDetails}">
+                <a class="nav-link" th:classappend="${activePage == 'companies-details'} ? ' active bg-primary text-white'"
+                    th:href="@{/companies/{id}(id=${company.companyId})}">
+                    <i class="fas fa-info-circle"></i>
+                    Company Details
                 </a>
             </li>
-            <li class="nav-item"><a class="nav-link" th:classappend="${activePage == 'employees'} ? ' active bg-primary text-white'" href="/employees"><i class="fas fa-users"></i> Employees</a></li>
-            <li class="nav-item"><a class="nav-link" th:classappend="${activePage == 'attendance'} ? ' active bg-primary text-white'" href="/attendance"><i class="fas fa-clock"></i> Attendance</a></li>
-            <li class="nav-item"><a class="nav-link" th:classappend="${activePage == 'payroll'} ? ' active bg-primary text-white'" href="/payroll"><i class="fas fa-money-bill"></i> Payroll</a></li>
-            <li class="nav-item"><a class="nav-link" th:classappend="${activePage == 'leaves'} ? ' active bg-primary text-white'" href="/leaves"><i class="fas fa-calendar-alt"></i> Leaves</a></li>
+            <li class="nav-item ms-5" th:if="${showDepartmentDetails}">
+                <a class="nav-link" th:classappend="${activePage == 'departments-details'} ? ' active bg-primary text-white' : ''"
+                    th:href="@{/departments/{companyId}/departments/{departmentId}/view(companyId=${company.companyId},departmentId=${department.departmentId})}">
+                    <i class="fas fa-sitemap"></i>
+                    Department Details
+                </a>
+            </li>
+            <li class="nav-item"><a class="nav-link"
+                    th:classappend="${activePage == 'employees'} ? ' active bg-primary text-white'" href="/employees"><i
+                        class="fas fa-users"></i> Employees</a></li>
+            <li class="nav-item"><a class="nav-link"
+                    th:classappend="${activePage == 'attendance'} ? ' active bg-primary text-white'"
+                    href="/attendance"><i class="fas fa-clock"></i> Attendance</a></li>
+            <li class="nav-item"><a class="nav-link"
+                    th:classappend="${activePage == 'payroll'} ? ' active bg-primary text-white'" href="/payroll"><i
+                        class="fas fa-money-bill"></i> Payroll</a></li>
+            <li class="nav-item"><a class="nav-link"
+                    th:classappend="${activePage == 'leaves'} ? ' active bg-primary text-white'" href="/leaves"><i
+                        class="fas fa-calendar-alt"></i> Leaves</a></li>
         </ul>
     </div>
 </body>
+
 </html>

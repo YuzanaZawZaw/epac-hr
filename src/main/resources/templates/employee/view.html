@@ -61,7 +61,7 @@
                                     <p class="info-label">Employee Code:</p>
                                     <p th:text="${employee.employeeCode}">EMP001</p>
                                 </div>
-                                <div class="col-md-6">
+                                <!-- <div class="col-md-6">
                                     <p class="info-label">Status:</p>
                                     <p>
                                         <span th:if="${employee.employeeStatus == 'ACTIVE'}" class="badge bg-success">Active</span>
@@ -69,7 +69,7 @@
                                         <span th:if="${employee.employeeStatus == 'TERMINATED'}" class="badge bg-danger">Terminated</span>
                                         <span th:if="${employee.employeeStatus == 'ON_LEAVE'}" class="badge bg-info">On Leave</span>
                                     </p>
-                                </div>
+                                </div> -->
                             </div>
 
                             <div class="row mb-3">
@@ -95,10 +95,10 @@
                             </div>
 
                             <div class="row mb-3">
-                                <div class="col-md-6">
+                                <!-- <div class="col-md-6">
                                     <p class="info-label">NASFUND Number:</p>
                                     <p th:text="${employee.nasfundNumber} ?: 'N/A'">NAS123456</p>
-                                </div>
+                                </div> -->
                                 <div class="col-md-6">
                                     <p class="info-label">Payroll No.:</p>
                                     <p th:text="${employee.payrollNo} ?: 'N/A'">PAY001</p>
@@ -140,7 +140,7 @@
                         <div class="info-section">
                             <h5><i class="fas fa-briefcase"></i> Employment Information</h5>
                             
-                            <div class="row mb-3">
+                            <!-- <div class="row mb-3">
                                 <div class="col-md-6">
                                     <p class="info-label">Department:</p>
                                     <p th:text="${employee.department?.departmentName} ?: 'N/A'">IT</p>
@@ -149,24 +149,24 @@
                                     <p class="info-label">Position:</p>
                                     <p th:text="${employee.position?.positionName} ?: 'N/A'">Manager</p>
                                 </div>
-                            </div>
+                            </div> -->
 
-                            <div class="row mb-3">
+                            <!-- <div class="row mb-3">
                                 <div class="col-md-6">
                                     <p class="info-label">Company:</p>
                                     <p th:text="${employee.company} ?: 'N/A'">ABC Company</p>
                                 </div>
-                                <!-- <div class="col-md-6">
+                                <div class="col-md-6">
                                     <p class="info-label">Company ID:</p>
                                     <p th:text="${employee.companyId} ?: 'N/A'">COM001</p>
-                                </div> -->
-                            </div>
+                                </div>
+                            </div> -->
 
                             <div class="row mb-3">
-                                <div class="col-md-6">
+                                <!-- <div class="col-md-6">
                                     <p class="info-label">Joined Date:</p>
                                     <p th:text="${employee.startedJoinedDate} ?: 'N/A'">2020-01-01</p>
-                                </div>
+                                </div> -->
                                 <div class="col-md-6">
                                     <p class="info-label">Hourly Rate:</p>
                                     <p th:text="'K' + ${#numbers.formatDecimal(employee.hourlyRate, 1, 2)}">K5.00</p>

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${employee.employeeId} ? 'Edit Employee' : 'Add Employee'" >Employee Form - EPAC HR System</title>
+    <title th:text="${employee.employeeId} ? 'Edit Employee' : 'Add Employee'">Employee Form - EPAC HR System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -11,21 +12,85 @@
             --primary-color: #2c3e50;
             --secondary-color: #3498db;
         }
-        body { background-color: #ecf0f1; margin-top: 60px; }
-        .navbar { background-color: var(--primary-color); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .sidebar { background-color: white; min-height: 100vh; box-shadow: 2px 0 4px rgba(0,0,0,0.1); position: fixed; width: 250px; left: 0; top: 60px; z-index: 100; }
-        .sidebar .nav-link { color: var(--primary-color); border-left: 4px solid transparent; padding: 12px 20px; }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: #ecf0f1; border-left-color: var(--secondary-color); color: var(--secondary-color); }
-        .main-content { margin-left: 250px; padding: 30px; }
-        .page-header { margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid var(--secondary-color); }
-        .page-header h1 { color: var(--primary-color); }
-        .card { border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .form-label { font-weight: 500; color: var(--primary-color); }
-        .form-section { margin-top: 25px; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #dee2e6; }
-        .form-section h5 { color: var(--secondary-color); font-weight: bold; margin-bottom: 15px; }
-        .required { color: #dc3545; }
+
+        body {
+            background-color: #ecf0f1;
+            margin-top: 60px;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            background-color: white;
+            min-height: 100vh;
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 250px;
+            left: 0;
+            top: 60px;
+            z-index: 100;
+        }
+
+        .sidebar .nav-link {
+            color: var(--primary-color);
+            border-left: 4px solid transparent;
+            padding: 12px 20px;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #ecf0f1;
+            border-left-color: var(--secondary-color);
+            color: var(--secondary-color);
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        .page-header h1 {
+            color: var(--primary-color);
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .form-section {
+            margin-top: 25px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .form-section h5 {
+            color: var(--secondary-color);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .required {
+            color: #dc3545;
+        }
     </style>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: var(--primary-color);">
         <div class="container-fluid">
@@ -37,7 +102,8 @@
 
     <main class="main-content">
         <div class="page-header">
-            <h1><i class="fas fa-users"></i> <span th:text="${employee.employeeId} ? 'Edit Employee' : 'Add New Employee'">Add New Employee</span></h1>
+            <h1><i class="fas fa-users"></i> <span
+                    th:text="${employee.employeeId} ? 'Edit Employee' : 'Add New Employee'">Add New Employee</span></h1>
         </div>
 
         <div class="row">
@@ -49,11 +115,11 @@
                     <div class="card-body">
                         <form th:action="@{/employees/save}" th:object="${employee}" method="POST">
                             <input type="hidden" th:field="*{employeeId}">
-                            
+
                             <!-- Personal Information Section -->
                             <div class="form-section">
                                 <h5><i class="fas fa-user"></i> Personal Information</h5>
-                                
+
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label">Employee Code <span class="required">*</span></label>
@@ -117,7 +183,7 @@
                             <!-- Contact Information Section -->
                             <div class="form-section">
                                 <h5><i class="fas fa-phone"></i> Contact Information</h5>
-                                
+
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label">Email</label>
@@ -165,7 +231,7 @@
                                     </div>
                                 </div> -->
 
-                                <!-- <div class="row mb-3">
+                            <!-- <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label">Company</label>
                                         <select class="form-control" th:field="*{company}">
@@ -179,42 +245,42 @@
                                     </div>
                                 </div> -->
 
-                                <div class="row mb-3">
-                                    <!-- <div class="col-md-6">
+                            <div class="row mb-3">
+                                <!-- <div class="col-md-6">
                                         <label class="form-label">Joined Date</label>
                                         <input type="date" class="form-control" th:field="*{startedJoinedDate}">
                                     </div> -->
-                                    <div class="col-md-6">
-                                        <label class="form-label">Hourly Rate</label>
-                                        <input type="number" class="form-control" th:field="*{hourlyRate}" step="0.01">
-                                    </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Hourly Rate</label>
+                                    <input type="number" class="form-control" th:field="*{hourlyRate}" step="0.01">
                                 </div>
                             </div>
-
-                            <!-- Additional Information Section -->
-                            <div class="form-section">
-                                <h5><i class="fas fa-notes-medical"></i> Additional Information</h5>
-                                
-                                <!-- <div class="row mb-3">
-                                    <div class="col-md-12">
-                                        <label class="form-label">Remarks</label>
-                                        <textarea class="form-control" th:field="*{remarks}" rows="3"></textarea>
-                                    </div>
-                                </div> -->
-                            </div>
-
-                            <!-- Form Actions -->
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-top: 30px;">
-                                <a href="/employees" class="btn btn-secondary btn-lg"><i class="fas fa-times"></i> Cancel</a>
-                                <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i> Save Employee</button>
-                            </div>
-                        </form>
                     </div>
+
+                    <!-- Additional Information Section -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-notes-medical"></i> Additional Information</h5>
+
+                        <div class="mb-3">
+                            <label for="remarks" class="form-label">Remarks</label>
+                            <textarea id="remarks" class="form-control" th:name="'remarks'" rows="4"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-top: 30px;">
+                        <a href="/employees" class="btn btn-secondary btn-lg"><i class="fas fa-times"></i> Cancel</a>
+                        <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i> Save
+                            Employee</button>
+                    </div>
+                    </form>
                 </div>
             </div>
+        </div>
         </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
