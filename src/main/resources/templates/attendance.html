@@ -118,12 +118,17 @@
       <h4>Attendance Sheet</h4>
       <div class="row mb-2">
         <div class="col-md-4">
-          Employee ID: <strong th:text="${employee.id}">A-002</strong><br />
+          Employee ID: <strong id="employeeCode" th:text="${employee.id}">A-002</strong><br />
           Name: <strong th:text="${employee.name}">OLIVER ROBERT</strong>
+          <input type="hidden" id="employeeIdHidden" th:value="${employee.id}" />
         </div>
         <div class="col-md-4">
-          Period from: <input type="date" id="periodFrom" th:value="${period.from}" class="form-control" />
-          Period to: <input type="date" id="periodTo" th:value="${period.to}" class="form-control mt-1" />
+          <label class="form-label">Fortnight</label>
+          <select id="fortnightSelect" class="form-select"></select>
+          <div class="mt-2">
+            Period from: <input type="date" id="periodFrom" th:value="${period.from}" class="form-control d-inline-block" style="width:auto;" />
+            Period to: <input type="date" id="periodTo" th:value="${period.to}" class="form-control d-inline-block mt-1" style="width:auto;" />
+          </div>
         </div>
         <div class="col-md-4 text-end">
           Position: <strong th:text="${employee.position}">General Labour</strong>
@@ -152,20 +157,8 @@
               <th></th>
             </tr>
           </thead>
-          <tbody>
-            <tr th:each="row,iterStat : ${rows}">
-              <td th:text="${row.date}">2026-07-27</td>
-              <td><input type="time" class="form-control form-control-sm time-input" th:value="${row.morningIn}" /></td>
-              <td><input type="time" class="form-control form-control-sm time-input" th:value="${row.morningOut}" />
-              </td>
-              <td><input type="time" class="form-control form-control-sm time-input" th:value="${row.afternoonIn}" />
-              </td>
-              <td><input type="time" class="form-control form-control-sm time-input" th:value="${row.afternoonOut}" />
-              </td>
-              <td class="hours"><input type="text" readonly class="form-control form-control-sm hours wh" /></td>
-              <td class="hours"><input type="text" readonly class="form-control form-control-sm hours ot" /></td>
-              <td><input type="text" class="form-control form-control-sm remarks" th:value="${row.remarks}" /></td>
-            </tr>
+          <tbody id="attendanceTbody">
+            <!-- rows built by JS -->
           </tbody>
         </table>
 
@@ -181,12 +174,34 @@
     </div>
 
     <script>
-      function parseTime(t) {
-        if (!t) return null;
-        const parts = t.split(':'); if (parts.length < 2) return null;
-        return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
-      }
+      // Utilities
+      function parseTime(t) { if (!t) return null; const parts = t.split(':'); if (parts.length < 2) return null; return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10); }
       function minutesToHours(mins) { return (Math.round((mins / 60) * 100) / 100).toFixed(2); }
+
+      // Build rows for date range; existingMap keyed by yyyy-mm-dd
+      function buildRows(fromStr, toStr, existingMap) {
+        const tbody = document.getElementById('attendanceTbody');
+        tbody.innerHTML = '';
+        const from = new Date(fromStr);
+        const to = new Date(toStr);
+        for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+          const iso = d.toISOString().slice(0,10);
+          const ex = existingMap && existingMap[iso];
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${iso}</td>
+            <td><input type="time" class="form-control form-control-sm time-input" value="${ex && ex.morningIn ? ex.morningIn : ''}" /></td>
+            <td><input type="time" class="form-control form-control-sm time-input" value="${ex && ex.morningOut ? ex.morningOut : ''}" /></td>
+            <td><input type="time" class="form-control form-control-sm time-input" value="${ex && ex.afternoonIn ? ex.afternoonIn : ''}" /></td>
+            <td><input type="time" class="form-control form-control-sm time-input" value="${ex && ex.afternoonOut ? ex.afternoonOut : ''}" /></td>
+            <td class="hours"><input type="text" readonly class="form-control form-control-sm hours wh" value="${ex && ex.workingHours ? ex.workingHours : ''}" /></td>
+            <td class="hours"><input type="text" readonly class="form-control form-control-sm hours ot" value="${ex && ex.overtimeHours ? ex.overtimeHours : ''}" /></td>
+            <td><input type="text" class="form-control form-control-sm remarks" value="${ex && ex.remarks ? ex.remarks : ''}" /></td>
+          `;
+          tbody.appendChild(tr);
+        }
+        recalcAll();
+      }
 
       function computeRow(mIn, mOut, aIn, aOut, whEl, otEl) {
         let working = 0;
@@ -200,7 +215,7 @@
       }
 
       function recalcAll() {
-        const tbody = document.querySelector('table tbody');
+        const tbody = document.getElementById('attendanceTbody');
         let totalW = 0, totalO = 0;
         tbody.querySelectorAll('tr').forEach((tr, idx) => {
           const inputs = tr.querySelectorAll('input[type="time"]');
@@ -214,11 +229,94 @@
       }
 
       document.addEventListener('input', function (e) { if (e.target.matches('input[type="time"]')) recalcAll(); });
-      window.addEventListener('load', recalcAll);
 
+      // Fetch fortnights list and populate select
+      async function loadFortnights() {
+        try {
+          const res = await fetch('/api/fortnights');
+          const data = await res.json();
+          const sel = document.getElementById('fortnightSelect');
+          sel.innerHTML = '<option value="">-- choose fortnight --</option>';
+          data.forEach(f => {
+            const opt = document.createElement('option');
+            opt.value = f.id;
+            opt.text = `${f.name} (${f.startDate} - ${f.endDate})`;
+            opt.dataset.start = f.startDate;
+            opt.dataset.end = f.endDate;
+            sel.appendChild(opt);
+          });
+
+          // if period inputs have values, try to select matching fortnight
+          const pFrom = document.getElementById('periodFrom').value;
+          const pTo = document.getElementById('periodTo').value;
+          if (pFrom && pTo) {
+            for (const o of sel.options) {
+              if (o.dataset.start === pFrom && o.dataset.end === pTo) { o.selected = true; break; }
+            }
+          }
+        } catch (err) {
+          console.error('Failed to load fortnights', err);
+        }
+      }
+
+      async function fetchExistingAttendance(employeeId, from, to) {
+        try {
+          const url = `/api/attendance?employeeId=${encodeURIComponent(employeeId)}&from=${from}&to=${to}`;
+          const res = await fetch(url);
+          if (!res.ok) return {};
+          const rows = await res.json();
+          // map by date (date property named 'date' or 'attendanceDate' depending on controller)
+          const map = {};
+          rows.forEach(r => {
+            const date = r.date || r.attendanceDate || r.dateString || (r.date && r.date.substring(0,10));
+            if (!date) return;
+            map[date] = {
+              morningIn: r.morningIn || r.morningTimeIn || (r.morningTimeIn ? r.morningTimeIn : ''),
+              morningOut: r.morningOut || r.morningTimeOut || '',
+              afternoonIn: r.afternoonIn || r.afternoonTimeIn || '',
+              afternoonOut: r.afternoonOut || r.afternoonTimeOut || '',
+              workingHours: r.workingHours || r.workingHoursString || r.working_hours || '',
+              overtimeHours: r.overtimeHours || r.overtime_hours || '',
+              remarks: r.remarks || ''
+            };
+          });
+          return map;
+        } catch (err) { console.error('fetchExistingAttendance failed', err); return {}; }
+      }
+
+      // When fortnight selected, update period and rows
+      document.getElementById('fortnightSelect').addEventListener('change', async function () {
+        const opt = this.options[this.selectedIndex];
+        if (!opt || !opt.dataset.start) return;
+        const start = opt.dataset.start;
+        const end = opt.dataset.end;
+        document.getElementById('periodFrom').value = start;
+        document.getElementById('periodTo').value = end;
+        const emp = document.getElementById('employeeIdHidden').value;
+        const existing = await fetchExistingAttendance(emp, start, end);
+        buildRows(start, end, existing);
+      });
+
+      // Also allow manual date change to rebuild rows
+      document.getElementById('periodFrom').addEventListener('change', async function () {
+        const start = this.value; const end = document.getElementById('periodTo').value;
+        if (!start || !end) return;
+        const emp = document.getElementById('employeeIdHidden').value;
+        const existing = await fetchExistingAttendance(emp, start, end);
+        buildRows(start, end, existing);
+      });
+      document.getElementById('periodTo').addEventListener('change', async function () {
+        const end = this.value; const start = document.getElementById('periodFrom').value;
+        if (!start || !end) return;
+        const emp = document.getElementById('employeeIdHidden').value;
+        const existing = await fetchExistingAttendance(emp, start, end);
+        buildRows(start, end, existing);
+      });
+
+      // Save handler uses table rows built by buildRows
       document.getElementById('saveBtn').addEventListener('click', async function () {
-        const employeeId = document.querySelector('[th\:text="${employee.id}"]') ? document.querySelector('[th\:text="${employee.id}"]').textContent.trim() : 'A-002';
-        const tbody = document.querySelector('table tbody');
+        const employeeId = document.getElementById('employeeIdHidden').value || 'A-002';
+        const tbody = document.getElementById('attendanceTbody');
         const rows = [];
         tbody.querySelectorAll('tr').forEach((tr) => {
           const date = tr.querySelector('td').textContent.trim();
@@ -230,9 +328,7 @@
         });
 
         try {
-          const res = await fetch('/api/attendance', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(rows)
-          });
+          const res = await fetch('/api/attendance', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(rows) });
           if (!res.ok) throw new Error('Save failed');
           const saved = await res.json();
           alert('Saved ' + saved.length + ' rows');
@@ -240,7 +336,7 @@
       });
 
       document.getElementById('exportCsv').addEventListener('click', function () {
-        const tbody = document.querySelector('table tbody');
+        const tbody = document.getElementById('attendanceTbody');
         const csv = ['Date,Morning Time In,Morning Time Out,Afternoon Time In,Afternoon Time Out,Working Hours,Overtime Hours,Remarks'];
         tbody.querySelectorAll('tr').forEach(tr => {
           const date = tr.querySelector('td').textContent.trim();
@@ -253,6 +349,19 @@
         const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a'); a.href = url; a.download = 'attendance.csv'; a.click(); URL.revokeObjectURL(url);
+      });
+
+      // On load
+      window.addEventListener('load', async function () {
+        await loadFortnights();
+        // if period inputs set, build rows using existing data
+        const start = document.getElementById('periodFrom').value;
+        const end = document.getElementById('periodTo').value;
+        const emp = document.getElementById('employeeIdHidden').value;
+        if (start && end) {
+          const existing = await fetchExistingAttendance(emp, start, end);
+          buildRows(start, end, existing);
+        }
       });
     </script>
   </main>
