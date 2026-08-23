@@ -35,7 +35,7 @@ public class AttendanceController {
         if (from == null) from = LocalDate.parse("2026-07-25");
         if (to == null) to = LocalDate.parse("2026-08-07");
 
-        model.addAttribute("employee", Map.of("id", employeeId, "name", "OLIVER ROBERT", "position","General Labour"));
+        model.addAttribute("employee", Map.of("id", employeeId, "name", "OLIVER ROBERT", "position","General Labour","hourlyRate", 5.00, "cashAdvance", 0.00));
         model.addAttribute("period", Map.of("from", from.toString(), "to", to.toString()));
 
         List<Attendance> rows = attendanceService.findByEmployeeAndPeriod(employeeId, from, to);
