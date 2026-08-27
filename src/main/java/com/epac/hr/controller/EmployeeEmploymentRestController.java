@@ -102,8 +102,8 @@ public class EmployeeEmploymentRestController {
             if (e.getPosition() != null) {
                 d.positionName = e.getPosition().getPositionName();
                 if (e.getPosition().getDepartment() != null) d.departmentName = e.getPosition().getDepartment().getDepartmentName();
-                if (e.getPosition().getDepartment() != null && e.getPosition().getDepartment().getCompany() != null)
-                    d.companyName = e.getPosition().getDepartment().getCompany().getCompanyName();
+                if (e.getPosition().getDepartment() != null && e.getPosition().getDepartment().getCompanyId() != null)
+                    d.companyName = e.getPosition().getDepartment().getCompanyId().getCompanyName();
             }
             return d;
         }).collect(Collectors.toList());
@@ -151,8 +151,8 @@ public class EmployeeEmploymentRestController {
         if (saved.getPosition() != null) {
             d.positionName = saved.getPosition().getPositionName();
             if (saved.getPosition().getDepartment() != null) d.departmentName = saved.getPosition().getDepartment().getDepartmentName();
-            if (saved.getPosition().getDepartment() != null && saved.getPosition().getDepartment().getCompany() != null)
-                d.companyName = saved.getPosition().getDepartment().getCompany().getCompanyName();
+            if (saved.getPosition().getDepartment() != null && saved.getPosition().getDepartment().getCompanyId() != null)
+                d.companyName = saved.getPosition().getDepartment().getCompanyId().getCompanyName();
         }
         return ResponseEntity.ok(d);
     }
