@@ -1,5 +1,5 @@
 <!-- Employment block added to employee details: choose company → departments → positions; CRUD for EmployeeEmployment -->
-<div class="info-section">
+<div th:fragment="employmentBlock" class="info-section">
     <h5><i class="fas fa-briefcase"></i> Employment Records</h5>
 
     <div class="row mb-3">
@@ -51,13 +51,22 @@
 
 <script>
     (function(){
-        const employeeId = /*[[${employee.employeeCode}]]*/ 'EMP_CODE_PLACEHOLDER';
-        // fallback if Thymeleaf didn't replace
-        const empCodeEl = document.querySelector('[th\:text="${employee.employeeCode}"]');
-        // helper to set employeeId from model if present on page
-        let emp = (document.getElementById('employeeCode') && document.getElementById('employeeCode').textContent.trim()) || null;
-        if (emp) {
-            // use employee code (as shown on page)
+        // helper to get employeeId (from data attribute set on view.html)
+        function getEmployeeId() {
+            const el = document.getElementById('employeeCode');
+            if (!el) return null;
+            const dataId = el.dataset ? el.dataset.employeeId : null;
+            if (dataId) {
+                const n = parseInt(dataId, 10);
+                if (!isNaN(n)) return n;
+            }
+            // fallback: try parse textContent
+            const txt = el.textContent && el.textContent.trim();
+            if (txt) {
+                const n = parseInt(txt, 10);
+                if (!isNaN(n)) return n;
+            }
+            return null;
         }
 
         async function fetchCompanies() {
@@ -73,7 +82,9 @@
             return res.ok ? await res.json() : [];
         }
         async function loadList() {
-            const resp = await fetch(`/api/employee-employment?employeeId=${encodeURIComponent(document.getElementById('employeeCode').textContent.trim())}`);
+            const empId = getEmployeeId();
+            if (!empId) { console.error('employeeId not found on page'); return; }
+            const resp = await fetch(`/api/employee-employment?employeeId=${encodeURIComponent(empId)}`);
             if (!resp.ok) return;
             const items = await resp.json();
             const tbody = document.querySelector('#ee_table tbody');
@@ -82,9 +93,9 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${idx+1}</td>
-                    <td>${it.employee ? (it.employee.companyName || '') : (it.employeeId || '')}</td>
-                    <td>${it.position ? (it.position.department ? it.position.department.departmentName : '') : (it.position ? it.position.positionName : '')}</td>
-                    <td>${it.position ? it.position.positionName : ''}</td>
+                    <td>${it.companyName || ''}</td>
+                    <td>${it.departmentName || ''}</td>
+                    <td>${it.positionName || ''}</td>
                     <td>${it.startDate || ''}</td>
                     <td>${it.endDate || ''}</td>
                     <td>${it.status || ''}</td>
@@ -97,8 +108,12 @@
             document.querySelectorAll('.ee-delete').forEach(btn => btn.addEventListener('click', async (e)=>{
                 const id = e.currentTarget.dataset.id;
                 if (!confirm('Delete this employment?')) return;
-                await fetch(`/api/employee-employment/${id}`, { method: 'DELETE' });
-                await loadList();
+                const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+                const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+                const headersDel = {};
+                if (csrfTokenMeta && csrfHeaderMeta) headersDel[csrfHeaderMeta.content] = csrfTokenMeta.content;
+                const delRes = await fetch(`/api/employee-employment/${id}`, { method: 'DELETE', headers: headersDel });
+                if (delRes.ok || delRes.status === 204) await loadList(); else alert('Delete failed: '+delRes.status);
             }));
         }
 
@@ -130,22 +145,29 @@
                 const startDate = document.getElementById('ee_start').value;
                 const endDate = document.getElementById('ee_end').value;
                 const status = document.getElementById('ee_status').value;
-                const employeeCode = document.getElementById('employeeCode').textContent.trim();
+                const employeeId = getEmployeeId();
                 if (!companyId || !departmentId || !positionId || !startDate) { alert('Please choose company, department, position and start date'); return; }
 
-                // build payload referencing employee by code; server expects EmployeeEmployment with nested employee/position
+                // build compact payload referencing employee by id
                 const payload = {
-                    employee: { employeeCode: employeeCode },
-                    position: { positionId: parseInt(positionId) },
+                    employeeId: employeeId,
+                    positionId: parseInt(positionId),
                     startDate: startDate,
                     endDate: endDate || null,
                     status: status
                 };
-                const res = await fetch('/api/employee-employment', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+
+                const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+                const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+                const headers = { 'Content-Type': 'application/json' };
+                if (csrfTokenMeta && csrfHeaderMeta) headers[csrfHeaderMeta.content] = csrfTokenMeta.content;
+
+                const res = await fetch('/api/employee-employment', { method: 'POST', headers: headers, body: JSON.stringify(payload) });
                 if (res.ok) {
                     await loadList();
                 } else {
-                    alert('Failed to add employment');
+                    const text = await res.text();
+                    alert('Failed to add employment: ' + res.status + ' ' + text);
                 }
             });
 
