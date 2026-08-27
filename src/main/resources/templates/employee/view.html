@@ -124,17 +124,8 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <p class="info-label">Employee Code:</p>
-                                    <p th:text="${employee.employeeCode}">EMP001</p>
+                                    <p id="employeeCode" th:text="${employee.employeeCode}">EMP001</p>
                                 </div>
-                                <!-- <div class="col-md-6">
-                                    <p class="info-label">Status:</p>
-                                    <p>
-                                        <span th:if="${employee.employeeStatus == 'ACTIVE'}" class="badge bg-success">Active</span>
-                                        <span th:if="${employee.employeeStatus == 'INACTIVE'}" class="badge bg-warning text-dark">Inactive</span>
-                                        <span th:if="${employee.employeeStatus == 'TERMINATED'}" class="badge bg-danger">Terminated</span>
-                                        <span th:if="${employee.employeeStatus == 'ON_LEAVE'}" class="badge bg-info">On Leave</span>
-                                    </p>
-                                </div> -->
                             </div>
 
                             <div class="row mb-3">
@@ -160,10 +151,6 @@
                             </div>
 
                             <div class="row mb-3">
-                                <!-- <div class="col-md-6">
-                                    <p class="info-label">NASFUND Number:</p>
-                                    <p th:text="${employee.nasfundNumber} ?: 'N/A'">NAS123456</p>
-                                </div> -->
                                 <div class="col-md-6">
                                     <p class="info-label">Payroll No.:</p>
                                     <p th:text="${employee.payrollNo} ?: 'N/A'">PAY001</p>
@@ -204,6 +191,8 @@
 
                         <!-- Employment Information Section -->
                         <div class="info-section">
+                            <h5><i class="fas fa-briefcase"></i> Employment Information</h5>
+
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <p class="info-label">Hourly Rate:</p>
