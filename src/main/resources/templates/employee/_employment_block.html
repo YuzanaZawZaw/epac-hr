@@ -1,0 +1,158 @@
+<!-- Employment block added to employee details: choose company → departments → positions; CRUD for EmployeeEmployment -->
+<div class="info-section">
+    <h5><i class="fas fa-briefcase"></i> Employment Records</h5>
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label class="form-label">Company</label>
+            <select id="ee_company" class="form-select"></select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Department</label>
+            <select id="ee_department" class="form-select"></select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Position</label>
+            <select id="ee_position" class="form-select"></select>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <label class="form-label">Start Date</label>
+            <input id="ee_start" type="date" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">End Date</label>
+            <input id="ee_end" type="date" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select id="ee_status" class="form-select">
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="TERMINATED">TERMINATED</option>
+                <option value="RESIGNED">RESIGNED</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button id="ee_add" class="btn btn-primary">Add Employment</button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered" id="ee_table">
+            <thead>
+                <tr><th>#</th><th>Company</th><th>Department</th><th>Position</th><th>Start</th><th>End</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    (function(){
+        const employeeId = /*[[${employee.employeeCode}]]*/ 'EMP_CODE_PLACEHOLDER';
+        // fallback if Thymeleaf didn't replace
+        const empCodeEl = document.querySelector('[th\:text="${employee.employeeCode}"]');
+        // helper to set employeeId from model if present on page
+        let emp = (document.getElementById('employeeCode') && document.getElementById('employeeCode').textContent.trim()) || null;
+        if (emp) {
+            // use employee code (as shown on page)
+        }
+
+        async function fetchCompanies() {
+            const res = await fetch('/api/employee-employment/companies');
+            return res.ok ? await res.json() : [];
+        }
+        async function fetchDepartments(companyId) {
+            const res = await fetch(`/api/employee-employment/companies/${companyId}/departments`);
+            return res.ok ? await res.json() : [];
+        }
+        async function fetchPositions(deptId) {
+            const res = await fetch(`/api/employee-employment/departments/${deptId}/positions`);
+            return res.ok ? await res.json() : [];
+        }
+        async function loadList() {
+            const resp = await fetch(`/api/employee-employment?employeeId=${encodeURIComponent(document.getElementById('employeeCode').textContent.trim())}`);
+            if (!resp.ok) return;
+            const items = await resp.json();
+            const tbody = document.querySelector('#ee_table tbody');
+            tbody.innerHTML = '';
+            items.forEach((it, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${idx+1}</td>
+                    <td>${it.employee ? (it.employee.companyName || '') : (it.employeeId || '')}</td>
+                    <td>${it.position ? (it.position.department ? it.position.department.departmentName : '') : (it.position ? it.position.positionName : '')}</td>
+                    <td>${it.position ? it.position.positionName : ''}</td>
+                    <td>${it.startDate || ''}</td>
+                    <td>${it.endDate || ''}</td>
+                    <td>${it.status || ''}</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-danger ee-delete" data-id="${it.employmentId}">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.querySelectorAll('.ee-delete').forEach(btn => btn.addEventListener('click', async (e)=>{
+                const id = e.currentTarget.dataset.id;
+                if (!confirm('Delete this employment?')) return;
+                await fetch(`/api/employee-employment/${id}`, { method: 'DELETE' });
+                await loadList();
+            }));
+        }
+
+        async function initForm() {
+            const companies = await fetchCompanies();
+            const compSel = document.getElementById('ee_company');
+            compSel.innerHTML = '<option value="">-- choose company --</option>';
+            companies.forEach(c => { const o = document.createElement('option'); o.value = c.companyId; o.text = c.companyName; compSel.appendChild(o); });
+
+            compSel.addEventListener('change', async function(){
+                const cid = this.value;
+                const deps = cid ? await fetchDepartments(cid) : [];
+                const depSel = document.getElementById('ee_department'); depSel.innerHTML = '<option value="">-- choose department --</option>';
+                deps.forEach(d=>{ const o=document.createElement('option'); o.value=d.departmentId; o.text=d.departmentName; depSel.appendChild(o); });
+                document.getElementById('ee_position').innerHTML = '<option value="">-- choose position --</option>';
+            });
+
+            document.getElementById('ee_department').addEventListener('change', async function(){
+                const did = this.value;
+                const positions = did ? await fetchPositions(did) : [];
+                const posSel = document.getElementById('ee_position'); posSel.innerHTML = '<option value="">-- choose position --</option>';
+                positions.forEach(p=>{ const o=document.createElement('option'); o.value=p.positionId; o.text=p.positionName; posSel.appendChild(o); });
+            });
+
+            document.getElementById('ee_add').addEventListener('click', async function(){
+                const companyId = document.getElementById('ee_company').value;
+                const departmentId = document.getElementById('ee_department').value;
+                const positionId = document.getElementById('ee_position').value;
+                const startDate = document.getElementById('ee_start').value;
+                const endDate = document.getElementById('ee_end').value;
+                const status = document.getElementById('ee_status').value;
+                const employeeCode = document.getElementById('employeeCode').textContent.trim();
+                if (!companyId || !departmentId || !positionId || !startDate) { alert('Please choose company, department, position and start date'); return; }
+
+                // build payload referencing employee by code; server expects EmployeeEmployment with nested employee/position
+                const payload = {
+                    employee: { employeeCode: employeeCode },
+                    position: { positionId: parseInt(positionId) },
+                    startDate: startDate,
+                    endDate: endDate || null,
+                    status: status
+                };
+                const res = await fetch('/api/employee-employment', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (res.ok) {
+                    await loadList();
+                } else {
+                    alert('Failed to add employment');
+                }
+            });
+
+            await loadList();
+        }
+
+        // initialize after DOM ready
+        document.addEventListener('DOMContentLoaded', initForm);
+    })();
+</script>
