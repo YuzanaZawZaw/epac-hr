@@ -117,102 +117,107 @@
                         <h5 class="mb-0" th:text="${employee.fullName}">Employee Name</h5>
                     </div>
                     <div class="card-body">
-                        <!-- Personal Information Section -->
-                        <div class="info-section">
-                            <h5><i class="fas fa-user"></i> Personal Information</h5>
 
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <p class="info-label">Employee Code:</p>
-                                    <p id="employeeCode" th:attr="data-employee-id=${employee.employeeId}" th:text="${employee.employeeCode}">EMP001</p>
+                        <!-- Two-column layout: left = Personal + Contact, right = Employment -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- Personal Information Section -->
+                                <div class="info-section">
+                                    <h5><i class="fas fa-user"></i> Personal Information</h5>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <p class="info-label">Employee Code:</p>
+                                            <p id="employeeCode" th:text="${employee.employeeCode}" th:attr="data-employee-id=${employee.employeeId}">EMP001</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <p class="info-label">First Name:</p>
+                                            <p th:text="${employee.firstName}">John</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="info-label">Last Name:</p>
+                                            <p th:text="${employee.lastName}">Doe</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <p class="info-label">Gender:</p>
+                                            <p th:text="${employee.gender} ?: 'N/A'">Male</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="info-label">Date of Birth:</p>
+                                            <p th:text="${employee.dateOfBirth} ?: 'N/A'">1990-01-01</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <p class="info-label">Payroll No.:</p>
+                                            <p th:text="${employee.payrollNo} ?: 'N/A'">PAY001</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Contact Information Section -->
+                                <div class="info-section">
+                                    <h5><i class="fas fa-phone"></i> Contact Information</h5>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <p class="info-label">Email:</p>
+                                            <p><a th:href="'mailto:' + ${employee.email}" th:text="${employee.email}">john@example.com</a></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="info-label">Phone No.:</p>
+                                            <p th:text="${employee.phoneNo} ?: 'N/A'">+1234567890</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <p class="info-label">Home Address:</p>
+                                            <p th:text="${employee.homeAddress} ?: 'N/A'">123 Main Street</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <p class="info-label">Province Address:</p>
+                                            <p th:text="${employee.provinceAddress} ?: 'N/A'">Province</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <p class="info-label">First Name:</p>
-                                    <p th:text="${employee.firstName}">John</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p class="info-label">Last Name:</p>
-                                    <p th:text="${employee.lastName}">Doe</p>
-                                </div>
-                            </div>
+                            <div class="col-md-6">
+                                <!-- Employment Information Section -->
+                                <div class="info-section">
+                                    <h5><i class="fas fa-briefcase"></i> Employment Information</h5>
 
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <p class="info-label">Gender:</p>
-                                    <p th:text="${employee.gender} ?: 'N/A'">Male</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p class="info-label">Date of Birth:</p>
-                                    <p th:text="${employee.dateOfBirth} ?: 'N/A'">1990-01-01</p>
-                                </div>
-                            </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <p class="info-label">Hourly Rate:</p>
+                                            <p th:text="'K' + ${#numbers.formatDecimal(employee.hourlyRate, 1, 2)}">K5.00</p>
+                                        </div>
+                                    </div>
 
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <p class="info-label">Payroll No.:</p>
-                                    <p th:text="${employee.payrollNo} ?: 'N/A'">PAY001</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Contact Information Section -->
-                        <div class="info-section">
-                            <h5><i class="fas fa-phone"></i> Contact Information</h5>
-
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <p class="info-label">Email:</p>
-                                    <p><a th:href="'mailto:' + ${employee.email}"
-                                            th:text="${employee.email}">john@example.com</a></p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p class="info-label">Phone No.:</p>
-                                    <p th:text="${employee.phoneNo} ?: 'N/A'">+1234567890</p>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-12">
-                                    <p class="info-label">Home Address:</p>
-                                    <p th:text="${employee.homeAddress} ?: 'N/A'">123 Main Street</p>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <p class="info-label">Province Address:</p>
-                                    <p th:text="${employee.provinceAddress} ?: 'N/A'">Province</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Employment Information Section -->
-                        <div class="info-section">
-                            <h5><i class="fas fa-briefcase"></i> Employment Information</h5>
-
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <p class="info-label">Hourly Rate:</p>
-                                    <p th:text="'K' + ${#numbers.formatDecimal(employee.hourlyRate, 1, 2)}">K5.00</p>
-                                </div>                                                
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-md-12">
                                     <!-- Include employment UI (company -> department -> position) -->
                                     <div th:replace="~{employee/_employment_block :: employmentBlock}"></div>
+
+                                </div>
+
+                                <!-- Additional Information Section -->
+                                <div class="info-section" th:if="${employee.remarks}">
+                                    <h5><i class="fas fa-notes-medical"></i> Remarks</h5>
+                                    <p th:text="${employee.remarks}">Additional remarks</p>
                                 </div>
                             </div>
-
                         </div>
 
-                        <!-- Additional Information Section -->
-                        <div class="info-section" th:if="${employee.remarks}">
-                            <h5><i class="fas fa-notes-medical"></i> Remarks</h5>
-                            <p th:text="${employee.remarks}">Additional remarks</p>
-                        </div>
                     </div>
                 </div>
             </div>
