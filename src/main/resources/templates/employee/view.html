@@ -112,7 +112,7 @@
 
         <div class="row">
             <div class="col-lg-10">
-                <div class="card">
+                <div class="card" id="employee-details-card" th:attr="data-employee-id=${employee.employeeId}">
                     <div class="card-header" style="background-color: var(--secondary-color); color: white;">
                         <h5 class="mb-0" th:text="${employee.fullName}">Employee Name</h5>
                     </div>
@@ -124,7 +124,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <p class="info-label">Employee Code:</p>
-                                    <p id="employeeCode" th:text="${employee.employeeCode}">EMP001</p>
+                                    <p id="employeeCode" th:attr="data-employee-id=${employee.employeeId}" th:text="${employee.employeeCode}">EMP001</p>
                                 </div>
                             </div>
 
@@ -202,7 +202,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <!-- Include employment UI (company -> department -> position) -->
-                                    <div th:replace="~{employee/_employment_block}"></div>  
+                                    <div th:replace="~{employee/_employment_block :: employmentBlock}"></div>
                                 </div>
                             </div>
 

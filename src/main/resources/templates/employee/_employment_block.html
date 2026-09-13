@@ -47,134 +47,141 @@
             <tbody></tbody>
         </table>
     </div>
-</div>
 
-<script>
-    (function(){
-        // helper to get employeeId (from data attribute set on view.html)
-        function getEmployeeId() {
-            const el = document.getElementById('employeeCode');
-            if (!el) return null;
-            const dataId = el.dataset ? el.dataset.employeeId : null;
-            if (dataId) {
-                const n = parseInt(dataId, 10);
-                if (!isNaN(n)) return n;
-            }
-            // fallback: try parse textContent
-            const txt = el.textContent && el.textContent.trim();
-            if (txt) {
-                const n = parseInt(txt, 10);
-                if (!isNaN(n)) return n;
-            }
-            return null;
-        }
-
-        async function fetchCompanies() {
-            const res = await fetch('/api/employee-employment/companies');
-            return res.ok ? await res.json() : [];
-        }
-        async function fetchDepartments(companyId) {
-            const res = await fetch(`/api/employee-employment/companies/${companyId}/departments`);
-            return res.ok ? await res.json() : [];
-        }
-        async function fetchPositions(deptId) {
-            const res = await fetch(`/api/employee-employment/departments/${deptId}/positions`);
-            return res.ok ? await res.json() : [];
-        }
-        async function loadList() {
-            const empId = getEmployeeId();
-            if (!empId) { console.error('employeeId not found on page'); return; }
-            const resp = await fetch(`/api/employee-employment?employeeId=${encodeURIComponent(empId)}`);
-            if (!resp.ok) return;
-            const items = await resp.json();
-            const tbody = document.querySelector('#ee_table tbody');
-            tbody.innerHTML = '';
-            items.forEach((it, idx) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${idx+1}</td>
-                    <td>${it.companyName || ''}</td>
-                    <td>${it.departmentName || ''}</td>
-                    <td>${it.positionName || ''}</td>
-                    <td>${it.startDate || ''}</td>
-                    <td>${it.endDate || ''}</td>
-                    <td>${it.status || ''}</td>
-                    <td>
-                      <button class="btn btn-sm btn-outline-danger ee-delete" data-id="${it.employmentId}">Delete</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            document.querySelectorAll('.ee-delete').forEach(btn => btn.addEventListener('click', async (e)=>{
-                const id = e.currentTarget.dataset.id;
-                if (!confirm('Delete this employment?')) return;
-                const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
-                const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
-                const headersDel = {};
-                if (csrfTokenMeta && csrfHeaderMeta) headersDel[csrfHeaderMeta.content] = csrfTokenMeta.content;
-                const delRes = await fetch(`/api/employee-employment/${id}`, { method: 'DELETE', headers: headersDel });
-                if (delRes.ok || delRes.status === 204) await loadList(); else alert('Delete failed: '+delRes.status);
-            }));
-        }
-
-        async function initForm() {
-            const companies = await fetchCompanies();
-            const compSel = document.getElementById('ee_company');
-            compSel.innerHTML = '<option value="">-- choose company --</option>';
-            companies.forEach(c => { const o = document.createElement('option'); o.value = c.companyId; o.text = c.companyName; compSel.appendChild(o); });
-
-            compSel.addEventListener('change', async function(){
-                const cid = this.value;
-                const deps = cid ? await fetchDepartments(cid) : [];
-                const depSel = document.getElementById('ee_department'); depSel.innerHTML = '<option value="">-- choose department --</option>';
-                deps.forEach(d=>{ const o=document.createElement('option'); o.value=d.departmentId; o.text=d.departmentName; depSel.appendChild(o); });
-                document.getElementById('ee_position').innerHTML = '<option value="">-- choose position --</option>';
-            });
-
-            document.getElementById('ee_department').addEventListener('change', async function(){
-                const did = this.value;
-                const positions = did ? await fetchPositions(did) : [];
-                const posSel = document.getElementById('ee_position'); posSel.innerHTML = '<option value="">-- choose position --</option>';
-                positions.forEach(p=>{ const o=document.createElement('option'); o.value=p.positionId; o.text=p.positionName; posSel.appendChild(o); });
-            });
-
-            document.getElementById('ee_add').addEventListener('click', async function(){
-                const companyId = document.getElementById('ee_company').value;
-                const departmentId = document.getElementById('ee_department').value;
-                const positionId = document.getElementById('ee_position').value;
-                const startDate = document.getElementById('ee_start').value;
-                const endDate = document.getElementById('ee_end').value;
-                const status = document.getElementById('ee_status').value;
-                const employeeId = getEmployeeId();
-                if (!companyId || !departmentId || !positionId || !startDate) { alert('Please choose company, department, position and start date'); return; }
-
-                // build compact payload referencing employee by id
-                const payload = {
-                    employeeId: employeeId,
-                    positionId: parseInt(positionId),
-                    startDate: startDate,
-                    endDate: endDate || null,
-                    status: status
-                };
-
-                const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
-                const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
-                const headers = { 'Content-Type': 'application/json' };
-                if (csrfTokenMeta && csrfHeaderMeta) headers[csrfHeaderMeta.content] = csrfTokenMeta.content;
-
-                const res = await fetch('/api/employee-employment', { method: 'POST', headers: headers, body: JSON.stringify(payload) });
-                if (res.ok) {
-                    await loadList();
-                } else {
-                    const text = await res.text();
-                    alert('Failed to add employment: ' + res.status + ' ' + text);
+    <script>
+        (function(){
+            function getEmployeeId() {
+                const card = document.getElementById('employee-details-card');
+                if (card && card.dataset && card.dataset.employeeId) {
+                    const n = parseInt(card.dataset.employeeId, 10);
+                    if (!isNaN(n)) return n;
                 }
-            });
 
-            await loadList();
-        }
+                const el = document.getElementById('employeeCode');
+                if (el && el.dataset && el.dataset.employeeId) {
+                    const n = parseInt(el.dataset.employeeId, 10);
+                    if (!isNaN(n)) return n;
+                }
 
-        // initialize after DOM ready
-        document.addEventListener('DOMContentLoaded', initForm);
-    })();
-</script>
+                if (el) {
+                    const txt = el.textContent && el.textContent.trim();
+                    if (txt) {
+                        const n = parseInt(txt, 10);
+                        if (!isNaN(n)) return n;
+                    }
+                }
+                return null;
+            }
+
+            async function fetchCompanies() {
+                const res = await fetch('/api/employee-employment/companies');
+                return res.ok ? await res.json() : [];
+            }
+            async function fetchDepartments(companyId) {
+                const res = await fetch(`/api/employee-employment/companies/${companyId}/departments`);
+                return res.ok ? await res.json() : [];
+            }
+            async function fetchPositions(deptId) {
+                const res = await fetch(`/api/employee-employment/departments/${deptId}/positions`);
+                return res.ok ? await res.json() : [];
+            }
+            async function loadList() {
+                const empId = getEmployeeId();
+                if (!empId) { console.error('employeeId not found on page'); return; }
+                const resp = await fetch(`/api/employee-employment?employeeId=${encodeURIComponent(empId)}`);
+                if (!resp.ok) return;
+                const items = await resp.json();
+                const tbody = document.querySelector('#ee_table tbody');
+                tbody.innerHTML = '';
+                items.forEach((it, idx) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${idx+1}</td>
+                        <td>${it.companyName || ''}</td>
+                        <td>${it.departmentName || ''}</td>
+                        <td>${it.positionName || ''}</td>
+                        <td>${it.startDate || ''}</td>
+                        <td>${it.endDate || ''}</td>
+                        <td>${it.status || ''}</td>
+                        <td>
+                          <button class="btn btn-sm btn-outline-danger ee-delete" data-id="${it.employmentId}">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                document.querySelectorAll('.ee-delete').forEach(btn => btn.addEventListener('click', async (e)=>{
+                    const id = e.currentTarget.dataset.id;
+                    if (!confirm('Delete this employment?')) return;
+                    const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+                    const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+                    const headersDel = {};
+                    if (csrfTokenMeta && csrfHeaderMeta) headersDel[csrfHeaderMeta.content] = csrfTokenMeta.content;
+                    const delRes = await fetch(`/api/employee-employment/${id}`, { method: 'DELETE', headers: headersDel });
+                    if (delRes.ok || delRes.status === 204) await loadList(); else alert('Delete failed: '+delRes.status);
+                }));
+            }
+
+            async function initForm() {
+                const companies = await fetchCompanies();
+                const compSel = document.getElementById('ee_company');
+                compSel.innerHTML = '<option value="">-- choose company --</option>';
+                companies.forEach(c => { const o = document.createElement('option'); o.value = c.companyId; o.text = c.companyName; compSel.appendChild(o); });
+
+                compSel.addEventListener('change', async function(){
+                    const cid = this.value;
+                    const deps = cid ? await fetchDepartments(cid) : [];
+                    const depSel = document.getElementById('ee_department'); depSel.innerHTML = '<option value="">-- choose department --</option>';
+                    deps.forEach(d=>{ const o=document.createElement('option'); o.value=d.departmentId; o.text=d.departmentName; depSel.appendChild(o); });
+                    document.getElementById('ee_position').innerHTML = '<option value="">-- choose position --</option>';
+                });
+
+                document.getElementById('ee_department').addEventListener('change', async function(){
+                    const did = this.value;
+                    const positions = did ? await fetchPositions(did) : [];
+                    const posSel = document.getElementById('ee_position'); posSel.innerHTML = '<option value="">-- choose position --</option>';
+                    positions.forEach(p=>{ const o=document.createElement('option'); o.value=p.positionId; o.text=p.positionName; posSel.appendChild(o); });
+                });
+
+                document.getElementById('ee_add').addEventListener('click', async function(){
+                    const companyId = document.getElementById('ee_company').value;
+                    const departmentId = document.getElementById('ee_department').value;
+                    const positionId = document.getElementById('ee_position').value;
+                    const startDate = document.getElementById('ee_start').value;
+                    const endDate = document.getElementById('ee_end').value;
+                    const status = document.getElementById('ee_status').value;
+                    const employeeId = getEmployeeId();
+                    if (!companyId || !departmentId || !positionId || !startDate) { alert('Please choose company, department, position and start date'); return; }
+
+                    const payload = {
+                        employeeId: employeeId,
+                        positionId: parseInt(positionId),
+                        startDate: startDate,
+                        endDate: endDate || null,
+                        status: status
+                    };
+
+                    const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+                    const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (csrfTokenMeta && csrfHeaderMeta) headers[csrfHeaderMeta.content] = csrfTokenMeta.content;
+
+                    const res = await fetch('/api/employee-employment', { method: 'POST', headers: headers, body: JSON.stringify(payload) });
+                    if (res.ok) {
+                        await loadList();
+                    } else {
+                        const text = await res.text();
+                        alert('Failed to add employment: ' + res.status + ' ' + text);
+                    }
+                });
+
+                await loadList();
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initForm);
+            } else {
+                initForm();
+            }
+        })();
+    </script>
+</div>
