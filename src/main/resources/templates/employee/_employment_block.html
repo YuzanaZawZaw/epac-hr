@@ -1,71 +1,67 @@
-<!-- Employment block added to employee details: choose company → departments → positions; CRUD for EmployeeEmployment -->
-<div th:fragment="employmentBlock" class="info-section">
-    <h5><i class="fas fa-briefcase"></i> Employment Records</h5>
+<!-- Employment block split into two fragments: employmentForm (left controls) and employmentTable (table + JS) -->
 
-    <div class="row">
-        <!-- Left panel: form controls -->
-        <div class="col-md-5">
-            <div class="card mb-3">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Company</label>
-                        <select id="ee_company" class="form-select"></select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Department</label>
-                        <select id="ee_department" class="form-select"></select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Position</label>
-                        <select id="ee_position" class="form-select"></select>
-                    </div>
+<!-- Form fragment: place this inside the Employment Information section -->
+<div th:fragment="employmentForm">
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label">Company</label>
+                <select id="ee_company" class="form-select"></select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Department</label>
+                <select id="ee_department" class="form-select"></select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Position</label>
+                <select id="ee_position" class="form-select"></select>
+            </div>
 
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label class="form-label">Start Date</label>
-                            <input id="ee_start" type="date" class="form-control" />
-                        </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label">End Date</label>
-                            <input id="ee_end" type="date" class="form-control" />
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Status</label>
-                        <select id="ee_status" class="form-select">
-                            <option value="ACTIVE">ACTIVE</option>
-                            <option value="TERMINATED">TERMINATED</option>
-                            <option value="RESIGNED">RESIGNED</option>
-                        </select>
-                    </div>
-
-                    <div class="d-grid">
-                        <button id="ee_add" class="btn btn-primary">Add Employment</button>
-                    </div>
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label class="form-label">Start Date</label>
+                    <input id="ee_start" type="date" class="form-control" />
+                </div>
+                <div class="col-6 mb-3">
+                    <label class="form-label">End Date</label>
+                    <input id="ee_end" type="date" class="form-control" />
                 </div>
             </div>
-        </div>
 
-        <!-- Right panel: list/table -->
-        <div class="col-md-7">
-            <div class="card mb-3">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm table-bordered" id="ee_table">
-                            <thead>
-                                <tr><th>#</th><th>Company</th><th>Department</th><th>Position</th><th>Start</th><th>End</th><th>Status</th><th>Actions</th></tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select id="ee_status" class="form-select">
+                    <option value="ACTIVE">ACTIVE</option>
+                    <option value="TERMINATED">TERMINATED</option>
+                    <option value="RESIGNED">RESIGNED</option>
+                </select>
+            </div>
+
+            <div class="d-grid">
+                <button id="ee_add" class="btn btn-primary">Add Employment</button>
             </div>
         </div>
     </div>
 </div>
 
-<script>
+
+<!-- Table fragment: place this below the Remarks section (it includes the JS to wire the form and table) -->
+<div th:fragment="employmentTable">
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="mb-3"><i class="fas fa-briefcase"></i> Employment Records</h5>
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered" id="ee_table">
+                    <thead>
+                        <tr><th>#</th><th>Company</th><th>Department</th><th>Position</th><th>Start</th><th>End</th><th>Status</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
     (function(){
         // helper to get employeeId (from data attribute set on view.html)
         function getEmployeeId() {
@@ -76,7 +72,6 @@
                 const n = parseInt(dataId, 10);
                 if (!isNaN(n)) return n;
             }
-            // fallback: try parse textContent
             const txt = el.textContent && el.textContent.trim();
             if (txt) {
                 const n = parseInt(txt, 10);
@@ -97,6 +92,7 @@
             const res = await fetch(`/api/employee-employment/departments/${deptId}/positions`);
             return res.ok ? await res.json() : [];
         }
+
         async function loadList() {
             const empId = getEmployeeId();
             if (!empId) { console.error('employeeId not found on page'); return; }
@@ -134,63 +130,75 @@
         }
 
         async function initForm() {
-            const companies = await fetchCompanies();
+            // init selects used by the form fragment (if present)
             const compSel = document.getElementById('ee_company');
-            compSel.innerHTML = '<option value="">-- choose company --</option>';
-            companies.forEach(c => { const o = document.createElement('option'); o.value = c.companyId; o.text = c.companyName; compSel.appendChild(o); });
+            if (compSel) {
+                const companies = await fetchCompanies();
+                compSel.innerHTML = '<option value="">-- choose company --</option>';
+                companies.forEach(c => { const o = document.createElement('option'); o.value = c.companyId; o.text = c.companyName; compSel.appendChild(o); });
 
-            compSel.addEventListener('change', async function(){
-                const cid = this.value;
-                const deps = cid ? await fetchDepartments(cid) : [];
-                const depSel = document.getElementById('ee_department'); depSel.innerHTML = '<option value="">-- choose department --</option>';
-                deps.forEach(d=>{ const o=document.createElement('option'); o.value=d.departmentId; o.text=d.departmentName; depSel.appendChild(o); });
-                document.getElementById('ee_position').innerHTML = '<option value="">-- choose position --</option>';
-            });
+                compSel.addEventListener('change', async function(){
+                    const cid = this.value;
+                    const deps = cid ? await fetchDepartments(cid) : [];
+                    const depSel = document.getElementById('ee_department'); if (depSel) {
+                        depSel.innerHTML = '<option value="">-- choose department --</option>';
+                        deps.forEach(d=>{ const o=document.createElement('option'); o.value=d.departmentId; o.text=d.departmentName; depSel.appendChild(o); });
+                    }
+                    const posEl = document.getElementById('ee_position'); if (posEl) posEl.innerHTML = '<option value="">-- choose position --</option>';
+                });
 
-            document.getElementById('ee_department').addEventListener('change', async function(){
-                const did = this.value;
-                const positions = did ? await fetchPositions(did) : [];
-                const posSel = document.getElementById('ee_position'); posSel.innerHTML = '<option value="">-- choose position --</option>';
-                positions.forEach(p=>{ const o=document.createElement('option'); o.value=p.positionId; o.text=p.positionName; posSel.appendChild(o); });
-            });
-
-            document.getElementById('ee_add').addEventListener('click', async function(){
-                const companyId = document.getElementById('ee_company').value;
-                const departmentId = document.getElementById('ee_department').value;
-                const positionId = document.getElementById('ee_position').value;
-                const startDate = document.getElementById('ee_start').value;
-                const endDate = document.getElementById('ee_end').value;
-                const status = document.getElementById('ee_status').value;
-                const employeeId = getEmployeeId();
-                if (!companyId || !departmentId || !positionId || !startDate) { alert('Please choose company, department, position and start date'); return; }
-
-                // build compact payload referencing employee by id
-                const payload = {
-                    employeeId: employeeId,
-                    positionId: parseInt(positionId),
-                    startDate: startDate,
-                    endDate: endDate || null,
-                    status: status
-                };
-
-                const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
-                const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
-                const headers = { 'Content-Type': 'application/json' };
-                if (csrfTokenMeta && csrfHeaderMeta) headers[csrfHeaderMeta.content] = csrfTokenMeta.content;
-
-                const res = await fetch('/api/employee-employment', { method: 'POST', headers: headers, body: JSON.stringify(payload) });
-                if (res.ok) {
-                    await loadList();
-                } else {
-                    const text = await res.text();
-                    alert('Failed to add employment: ' + res.status + ' ' + text);
+                const depEl = document.getElementById('ee_department');
+                if (depEl) {
+                    depEl.addEventListener('change', async function(){
+                        const did = this.value;
+                        const positions = did ? await fetchPositions(did) : [];
+                        const posSel = document.getElementById('ee_position'); if (posSel) {
+                            posSel.innerHTML = '<option value="">-- choose position --</option>';
+                            positions.forEach(p=>{ const o=document.createElement('option'); o.value=p.positionId; o.text=p.positionName; posSel.appendChild(o); });
+                        }
+                    });
                 }
-            });
+
+                const addBtn = document.getElementById('ee_add');
+                if (addBtn) {
+                    addBtn.addEventListener('click', async function(){
+                        const positionIdEl = document.getElementById('ee_position');
+                        const positionId = positionIdEl ? positionIdEl.value : null;
+                        const startDate = document.getElementById('ee_start') ? document.getElementById('ee_start').value : null;
+                        const endDate = document.getElementById('ee_end') ? document.getElementById('ee_end').value : null;
+                        const status = document.getElementById('ee_status') ? document.getElementById('ee_status').value : null;
+                        const employeeId = getEmployeeId();
+
+                        if (!positionId || !startDate) { alert('Please choose position and start date'); return; }
+
+                        const payload = {
+                            employeeId: employeeId,
+                            positionId: parseInt(positionId),
+                            startDate: startDate,
+                            endDate: endDate || null,
+                            status: status
+                        };
+
+                        const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+                        const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+                        const headers = { 'Content-Type': 'application/json' };
+                        if (csrfTokenMeta && csrfHeaderMeta) headers[csrfHeaderMeta.content] = csrfTokenMeta.content;
+
+                        const res = await fetch('/api/employee-employment', { method: 'POST', headers: headers, body: JSON.stringify(payload) });
+                        if (res.ok) {
+                            await loadList();
+                        } else {
+                            const text = await res.text();
+                            alert('Failed to add employment: ' + res.status + ' ' + text);
+                        }
+                    });
+                }
+            }
 
             await loadList();
         }
 
-        // initialize after DOM ready
         document.addEventListener('DOMContentLoaded', initForm);
     })();
-</script>
+    </script>
+</div>
