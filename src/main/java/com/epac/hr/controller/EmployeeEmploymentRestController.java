@@ -72,6 +72,7 @@ public class EmployeeEmploymentRestController {
 
     // compact request payload for creating employment
     public static class EmploymentRequest {
+        public Integer employeeId;
         public String employeeCode; // or employeeId as string
         public Integer positionId;
         public String startDate; // ISO yyyy-MM-dd
@@ -112,6 +113,7 @@ public class EmployeeEmploymentRestController {
 
     @PostMapping
     public ResponseEntity<EmployeeEmploymentDto> create(@RequestBody EmploymentRequest req) {
+        System.out.println("create employment: " + req.employeeId + ", positionId=" + req.positionId);
         if (req == null || (req.employeeCode == null && req.positionId == null)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid payload");
         }
@@ -119,7 +121,7 @@ public class EmployeeEmploymentRestController {
         // resolve employee by code or numeric id
         Optional<Employee> empOpt = Optional.empty();
         try {
-            Integer id = Integer.valueOf(req.employeeCode);
+            Integer id = Integer.valueOf(req.employeeId);
             empOpt = employeeRepository.findById(id);
         } catch (Exception ignored) {}
         if (empOpt.isEmpty()) empOpt = employeeRepository.findByEmployeeCode(req.employeeCode);

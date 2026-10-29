@@ -68,6 +68,7 @@
         (function(){
             function getEmployeeId() {
                 const card = document.getElementById('employee-details-card');
+                console.log('getEmployeeId: card=', card.dataset.employeeId);
                 if (card && card.dataset && card.dataset.employeeId) {
                     const n = parseInt(card.dataset.employeeId, 10);
                     if (!isNaN(n)) return n;
